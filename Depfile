@@ -1,0 +1,5 @@
+---
+go:
+  goreleaser:
+    importPath: github.com/goreleaser/goreleaser
+    version: "v0.174.2"
