@@ -41,10 +41,8 @@ func (o *OktaPlugin) Open(cfg plugin.PluginConfig) error {
 	o.Config = config
 
 	ctx, client, err := okta.NewClient(context.Background(),
-		okta.WithOrgUrl(fmt.Sprintf("https://%s", config.Domain)),
-		okta.WithToken(config.ApiToken),
-		okta.WithRequestTimeout(45),
-		okta.WithRateLimitMaxRetries(3),
+		okta.WithOrgUrl(fmt.Sprintf("https://%s", config.OktaDomain)),
+		okta.WithToken(config.OktaApiToken),
 	)
 
 	if err != nil {

@@ -1,0 +1,61 @@
+before:
+  hooks:
+
+builds:
+  - id: aserto-idp-plugin-okta
+    main: ./cmd/aserto-idp-plugin-okta
+    binary: aserto-idp-plugin-okta
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    env:
+      - CGO_ENABLED=0
+    ignore:
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s
+      - -w
+      - -X pkg/config.ver={{.Version}}
+      - -X pkg/config.commit={{.ShortCommit}}
+      - -X pkg/config.date={{.Date}}
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    no_unique_dist_dir: true
+
+archives:
+  - format: zip
+    replacements:
+      darwin: darwin
+      linux: linux
+      windows: windows
+      amd64: x86_64
+    files:
+      - LICENSE
+      - README.md
+    name_template: "aserto-idp-plugin-okta{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: "checksums.txt"
+
+snapshot:
+  name_template: "{{ .Tag }}"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+release:
+  github:
+    owner: aserto-dev
+    name: aserto-idp-plugin-okta
+
+  draft: false
+  prerelease: false
+  name_template: "aserto-idp-plugin-okta {{.Tag}}"
