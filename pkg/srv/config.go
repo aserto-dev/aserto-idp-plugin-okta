@@ -3,9 +3,9 @@ package srv
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/okta/okta-sdk-golang/v2/okta"
+	"github.com/okta/okta-sdk-golang/v2/okta/query"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -22,36 +22,35 @@ func GetVersion() (string, string, string) {
 }
 
 type OktaConfig struct {
-	Domain   string `description:"Okta domain" kind:"attribute" mode:"normal" readonly:"false"`
-	ApiToken string `description:"Okta API Token" kind:"attribute" mode:"normal" readonly:"false"`
+	OktaDomain   string `description:"Okta domain" kind:"attribute" mode:"normal" readonly:"false"`
+	OktaApiToken string `description:"Okta API Token" kind:"attribute" mode:"normal" readonly:"false"`
 }
 
 func (c *OktaConfig) Validate() error {
-	domain := fmt.Sprintf("https://%s", c.Domain)
-	log.Printf("------------------- Starting validation")
+
+	if c.OktaDomain == "" {
+		return status.Error(codes.InvalidArgument, "no okta domain was provided")
+	}
+
+	if c.OktaApiToken == "" {
+		return status.Error(codes.InvalidArgument, "no okta api token was provided")
+	}
+
 	ctx, client, err := okta.NewClient(context.Background(),
-		okta.WithOrgUrl(domain),
-		okta.WithToken(c.ApiToken),
-		okta.WithRequestTimeout(45),
-		okta.WithRateLimitMaxRetries(3),
+		okta.WithOrgUrl(fmt.Sprintf("https://%s", c.OktaDomain)),
+		okta.WithToken(c.OktaApiToken),
 	)
 
-	log.Printf("-------------------  Client created")
-
 	if err != nil {
 		return status.Errorf(codes.Internal, "failed to connect to Okta: %s", err.Error())
 	}
 
-	users, resp, err := client.User.ListUsers(ctx, nil)
+	filter := query.NewQueryParams(query.WithFilter("status eq \"ACTIVE\""), query.WithLimit(1))
+	_, _, errReq := client.User.ListUsers(ctx, filter)
 
-	if err != nil {
-		return status.Errorf(codes.Internal, "failed to connect to Okta: %s", err.Error())
+	if errReq != nil {
+		return status.Errorf(codes.Internal, "failed to retrieve user from Okta: %s", errReq.Error())
 	}
-
-	log.Printf("------------------- Users retrieved")
-	log.Printf("users: %v\n", users)
-	log.Printf("resp: %v\n", resp)
-	log.Printf("-------------------  Exit...")
 
 	return nil
 }
