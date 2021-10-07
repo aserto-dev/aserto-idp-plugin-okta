@@ -4,23 +4,23 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 
 	api "github.com/aserto-dev/go-grpc/aserto/api/v1"
 	"github.com/aserto-dev/idp-plugin-sdk/plugin"
+	multierror "github.com/hashicorp/go-multierror"
 	"github.com/okta/okta-sdk-golang/v2/okta"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-// const (
-// 	maxBatchSize = int64(500 * 1024)
-// )
-
 type OktaPlugin struct {
-	Config *OktaConfig
-	client *okta.Client
-	ctx    context.Context
-	// users  []map[string]interface{}
+	Config       *OktaConfig
+	client       *okta.Client
+	ctx          context.Context
+	response     *okta.Response
+	users        []*okta.User
+	finishedRead bool
 }
 
 func NewOktaPlugin() *OktaPlugin {
@@ -35,9 +35,11 @@ func (s *OktaPlugin) GetConfig() plugin.PluginConfig {
 
 func (o *OktaPlugin) Open(cfg plugin.PluginConfig) error {
 	config, ok := cfg.(*OktaConfig)
+
 	if !ok {
 		return errors.New("invalid config")
 	}
+
 	o.Config = config
 
 	ctx, client, err := okta.NewClient(context.Background(),
@@ -51,17 +53,68 @@ func (o *OktaPlugin) Open(cfg plugin.PluginConfig) error {
 
 	o.ctx = ctx
 	o.client = client
+	o.finishedRead = false
 	return nil
 }
 
 func (o *OktaPlugin) Read() ([]*api.User, error) {
-	users, _, err := o.client.User.ListUsers(o.ctx, nil)
-
-	for _, user := range users {
-		fmt.Println(user)
+	if o.finishedRead {
+		return nil, io.EOF
 	}
 
-	return nil, err
+	var errs error
+	var users []*api.User
+
+	if o.response == nil {
+		oktaUsers, resp, err := o.client.User.ListUsers(o.ctx, nil)
+
+		if err != nil {
+			return nil, err
+		}
+
+		for _, u := range oktaUsers {
+
+			user, err := Transform(u)
+			if err != nil {
+				errs = multierror.Append(errs, err)
+			}
+
+			users = append(users, user)
+		}
+
+		if resp.HasNextPage() {
+			o.response = resp
+			o.users = oktaUsers
+		} else {
+			o.finishedRead = true
+		}
+
+		return users, errs
+	}
+
+	resp, err := o.response.Next(o.ctx, o.users)
+
+	if err != nil {
+		errs = multierror.Append(errs, err)
+		return nil, errs
+	}
+
+	for _, u := range o.users {
+		user, err := Transform(u)
+		if err != nil {
+			errs = multierror.Append(errs, err)
+		}
+
+		users = append(users, user)
+	}
+
+	if resp.HasNextPage() {
+		o.response = resp
+	} else {
+		o.finishedRead = true
+	}
+
+	return users, errs
 }
 
 func (s *OktaPlugin) Write(user *api.User) error {
