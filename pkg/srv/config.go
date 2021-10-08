@@ -45,7 +45,7 @@ func (c *OktaConfig) Validate() error {
 		return status.Errorf(codes.Internal, "failed to connect to Okta: %s", err.Error())
 	}
 
-	filter := query.NewQueryParams(query.WithFilter("status eq \"ACTIVE\""), query.WithLimit(1))
+	filter := query.NewQueryParams(query.WithLimit(1))
 	_, _, errReq := client.User.ListUsers(ctx, filter)
 
 	if errReq != nil {
