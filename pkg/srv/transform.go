@@ -9,6 +9,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/okta/okta-sdk-golang/v2/okta"
+	"github.com/okta/okta-sdk-golang/v2/okta/query"
 )
 
 const (
@@ -26,11 +27,18 @@ func ConstructOktaProfile(in *api.User) *okta.UserProfile {
 	profile["email"] = in.Email
 	profile["login"] = in.Email
 
+	for key, value := range in.Attributes.Properties.Fields {
+		if key == "status" {
+			profile["status"] = strings.ToUpper(value.GetStringValue())
+		} else {
+			profile[key] = value
+		}
+	}
+
 	return &profile
 }
 
 func TransformToOktaUserReq(in *api.User) *okta.CreateUserRequest {
-	// TODO: add phoneNumber, status & custom attributes to Profile
 
 	uc := &okta.UserCredentials{}
 
@@ -44,7 +52,6 @@ func TransformToOktaUserReq(in *api.User) *okta.CreateUserRequest {
 
 // Transform Okta user definition into Aserto Edge User object definition.
 func Transform(in *okta.User) (*api.User, error) {
-	// TODO: add status as an attribute & other custom attributes
 
 	profileMap := in.Profile
 	displayName := fmt.Sprintf("%s %s", (*profileMap)["firstName"], (*profileMap)["lastName"])
@@ -79,6 +86,25 @@ func Transform(in *okta.User) (*api.User, error) {
 		},
 	}
 
+	user.Attributes.Properties.Fields["status"] = structpb.NewStringValue(status)
+
+	for key, value := range *profileMap {
+		stringValue := fmt.Sprint(value)
+		switch key {
+		case
+			"mobilePhone",
+			"login",
+			"email",
+			"firstName",
+			"lastName":
+			continue
+		default:
+			if value != nil {
+				user.Attributes.Properties.Fields[key] = structpb.NewStringValue(stringValue)
+			}
+		}
+	}
+
 	user.Identities[in.Id] = &api.IdentitySource{
 		Kind:     api.IdentityKind_IDENTITY_KIND_PID,
 		Provider: provider,
@@ -100,4 +126,14 @@ func Transform(in *okta.User) (*api.User, error) {
 	}
 
 	return &user, nil
+}
+
+func CreateQueryWithStatus(profile *okta.UserProfile) *query.Params {
+	status := fmt.Sprint((*profile)["status"])
+
+	if status == "" {
+		return query.NewQueryParams(query.WithActivate(true))
+	}
+
+	return query.NewQueryParams(query.WithActivate(true), query.WithStatus(status))
 }
