@@ -10,6 +10,7 @@ import (
 	"github.com/aserto-dev/idp-plugin-sdk/plugin"
 	multierror "github.com/hashicorp/go-multierror"
 	"github.com/okta/okta-sdk-golang/v2/okta"
+	"github.com/okta/okta-sdk-golang/v2/okta/query"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -33,7 +34,7 @@ func (s *OktaPlugin) GetConfig() plugin.PluginConfig {
 	return &OktaConfig{}
 }
 
-func (o *OktaPlugin) Open(cfg plugin.PluginConfig) error {
+func (o *OktaPlugin) Open(cfg plugin.PluginConfig, op plugin.OperationType) error {
 	config, ok := cfg.(*OktaConfig)
 
 	if !ok {
@@ -117,104 +118,33 @@ func (o *OktaPlugin) Read() ([]*api.User, error) {
 	return users, errs
 }
 
-func (s *OktaPlugin) Write(user *api.User) error {
-	// u, err := TransformToOkta(user)
-	// if err != nil {
-	// 	return err
-	// }
+func (o *OktaPlugin) Write(user *api.User) error {
+	_, _, err := o.client.User.GetUser(o.ctx, user.Id)
+	qp := query.NewQueryParams(query.WithActivate(true))
 
-	// userMap, size, err := structToMap(u)
-	// if err != nil {
-	// 	return err
-	// }
+	if err != nil {
+		u := TransformToOktaUserReq(user)
 
-	// if s.totalSize+size < maxBatchSize {
-	// 	s.users = append(s.users, userMap)
-	// } else {
-	// 	err = s.startJob()
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	s.users = make([]map[string]interface{}, 0)
-	// 	s.users = append(s.users, userMap)
-	// }
+		_, _, err := o.client.User.CreateUser(o.ctx, *u, qp)
 
+		if err != nil {
+			return err
+		}
+	} else {
+		updatedUser := &okta.User{
+			Profile: ConstructOktaProfile(user),
+		}
+
+		o.client.User.UpdateUser(o.ctx, user.Id, *updatedUser, qp)
+	}
+
+	return nil
+}
+
+func (s *OktaPlugin) Delete(id string) error {
 	return nil
 }
 
 func (s *OktaPlugin) Close() error {
-	// if len(s.users) > 0 {
-	// 	err := s.startJob()
-
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
-
-	// var errs error
-	// for _, j := range s.jobs {
-	// 	jobID := okta.StringValue(j.ID)
-	// 	err := s.waitJob(jobID)
-	// 	if err != nil {
-	// 		errs = multierror.Append(errs, err)
-	// 	}
-	// }
 	return nil
 }
-
-// func (s *OktaPlugin) waitJob(jobID string) error {
-// 	// for {
-// 	// 	j, err := s.mgmt.Job.Read(jobID)
-// 	// 	if err != nil {
-// 	// 		return err
-// 	// 	}
-
-// 	// 	switch *j.Status {
-// 	// 	case "pending":
-// 	// 		{
-// 	// 			time.Sleep(1 * time.Second)
-// 	// 			continue
-// 	// 		}
-// 	// 	case "failed":
-// 	// 		return fmt.Errorf("Job %s failed", jobID)
-// 	// 	case "completed":
-// 	// 		return nil
-// 	// 	default:
-// 	// 		return fmt.Errorf("Unknown status")
-// 	// 	}
-// 	// }
-// 	return nil
-// }
-
-// func (s *OktaPlugin) startJob() error {
-// 	// job := &management.Job{
-// 	// 	ConnectionID:        auth0.String(s.connectionID),
-// 	// 	Upsert:              auth0.Bool(true),
-// 	// 	SendCompletionEmail: auth0.Bool(false),
-// 	// 	Users:               s.users,
-// 	// }
-// 	// s.wg.Add(1)
-// 	// defer s.wg.Done()
-// 	// err := s.mgmt.Job.ImportUsers(job)
-// 	// if err != nil {
-// 	// 	return err
-// 	// }
-// 	// s.jobs = append(s.jobs, *job)
-
-// 	return nil
-// }
-
-// func structToMap(in interface{}) (map[string]interface{}, int64, error) {
-// 	// data, err := json.Marshal(in)
-// 	// if err != nil {
-// 	// 	return nil, 0, err
-// 	// }
-// 	// res := make(map[string]interface{})
-// 	// err = json.Unmarshal(data, &res)
-// 	// if err != nil {
-// 	// 	return nil, 0, err
-// 	// }
-// 	// size := int64(len(data))
-// 	//return res, size, nil
-// 	return nil, 0, nil
-// }
