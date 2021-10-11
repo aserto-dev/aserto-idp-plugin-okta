@@ -141,10 +141,22 @@ func (o *OktaPlugin) Write(user *api.User) error {
 	return nil
 }
 
-func (s *OktaPlugin) Delete(id string) error {
+func (o *OktaPlugin) Delete(id string) error {
+	_, err := o.client.User.DeactivateUser(o.ctx, id, nil)
+
+	if err != nil {
+		return err
+	}
+
+	_, errs := o.client.User.DeactivateOrDeleteUser(o.ctx, id, nil)
+
+	if errs != nil {
+		return errs
+	}
+
 	return nil
 }
 
-func (s *OktaPlugin) Close() error {
+func (o *OktaPlugin) Close() error {
 	return nil
 }
