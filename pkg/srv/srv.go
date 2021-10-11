@@ -133,7 +133,11 @@ func (o *OktaPlugin) Write(user *api.User) error {
 			Profile: ConstructOktaProfile(user),
 		}
 
-		o.client.User.UpdateUser(o.ctx, user.Id, *updatedUser, CreateQueryWithStatus(updatedUser.Profile))
+		_, _, err := o.client.User.UpdateUser(o.ctx, user.Id, *updatedUser, CreateQueryWithStatus(updatedUser.Profile))
+
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
