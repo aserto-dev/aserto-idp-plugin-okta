@@ -10,7 +10,6 @@ import (
 	"github.com/aserto-dev/idp-plugin-sdk/plugin"
 	multierror "github.com/hashicorp/go-multierror"
 	"github.com/okta/okta-sdk-golang/v2/okta"
-	"github.com/okta/okta-sdk-golang/v2/okta/query"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -120,12 +119,11 @@ func (o *OktaPlugin) Read() ([]*api.User, error) {
 
 func (o *OktaPlugin) Write(user *api.User) error {
 	_, _, err := o.client.User.GetUser(o.ctx, user.Id)
-	qp := query.NewQueryParams(query.WithActivate(true))
 
 	if err != nil {
 		u := TransformToOktaUserReq(user)
 
-		_, _, err := o.client.User.CreateUser(o.ctx, *u, qp)
+		_, _, err := o.client.User.CreateUser(o.ctx, *u, CreateQueryWithStatus(u.Profile))
 
 		if err != nil {
 			return err
@@ -135,7 +133,7 @@ func (o *OktaPlugin) Write(user *api.User) error {
 			Profile: ConstructOktaProfile(user),
 		}
 
-		o.client.User.UpdateUser(o.ctx, user.Id, *updatedUser, qp)
+		o.client.User.UpdateUser(o.ctx, user.Id, *updatedUser, CreateQueryWithStatus(updatedUser.Profile))
 	}
 
 	return nil
