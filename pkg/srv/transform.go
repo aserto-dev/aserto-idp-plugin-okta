@@ -8,6 +8,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/dongri/phonenumber"
 	"github.com/okta/okta-sdk-golang/v2/okta"
 	"github.com/okta/okta-sdk-golang/v2/okta/query"
 )
@@ -89,6 +90,8 @@ func Transform(in *okta.User) (*api.User, error) {
 	user.Attributes.Properties.Fields["status"] = structpb.NewStringValue(status)
 
 	for key, value := range *profileMap {
+		stringValue := fmt.Sprint(value)
+
 		switch key {
 		case
 			"mobilePhone",
@@ -98,8 +101,7 @@ func Transform(in *okta.User) (*api.User, error) {
 			"lastName":
 			continue
 		default:
-			if value != nil {
-				stringValue := fmt.Sprint(value)
+			if value != nil && stringValue != "" {
 				user.Attributes.Properties.Fields[key] = structpb.NewStringValue(stringValue)
 			}
 		}
@@ -117,12 +119,16 @@ func Transform(in *okta.User) (*api.User, error) {
 		Verified: verified,
 	}
 
-	if (*profileMap)["mobilePhone"] != nil {
-		phone := (*profileMap)["mobilePhone"].(string)
-		user.Identities[phone] = &api.IdentitySource{
+	mobilePhone := fmt.Sprint((*profileMap)["mobilePhone"])
+
+	country := phonenumber.GetISO3166ByNumber(mobilePhone, true)
+	mobilePhoneE164 := phonenumber.ParseWithLandLine(fmt.Sprint((*profileMap)["mobilePhone"]), country.Alpha2)
+
+	if mobilePhoneE164 != "" {
+		user.Identities[mobilePhoneE164] = &api.IdentitySource{
 			Kind:     api.IdentityKind_IDENTITY_KIND_PHONE,
 			Provider: provider,
-			Verified: false,
+			Verified: verified,
 		}
 	}
 
