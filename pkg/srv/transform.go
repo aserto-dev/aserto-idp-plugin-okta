@@ -89,7 +89,6 @@ func Transform(in *okta.User) (*api.User, error) {
 	user.Attributes.Properties.Fields["status"] = structpb.NewStringValue(status)
 
 	for key, value := range *profileMap {
-		stringValue := fmt.Sprint(value)
 		switch key {
 		case
 			"mobilePhone",
@@ -100,6 +99,7 @@ func Transform(in *okta.User) (*api.User, error) {
 			continue
 		default:
 			if value != nil {
+				stringValue := fmt.Sprint(value)
 				user.Attributes.Properties.Fields[key] = structpb.NewStringValue(stringValue)
 			}
 		}
@@ -121,7 +121,8 @@ func Transform(in *okta.User) (*api.User, error) {
 		phone := (*profileMap)["mobilePhone"].(string)
 		user.Identities[phone] = &api.IdentitySource{
 			Kind:     api.IdentityKind_IDENTITY_KIND_PHONE,
-			Verified: verified,
+			Provider: provider,
+			Verified: false,
 		}
 	}
 
@@ -129,11 +130,12 @@ func Transform(in *okta.User) (*api.User, error) {
 }
 
 func CreateQueryWithStatus(profile *okta.UserProfile) *query.Params {
-	status := fmt.Sprint((*profile)["status"])
 
-	if status == "" {
-		return query.NewQueryParams(query.WithActivate(true))
+	if (*profile)["status"] != nil {
+		status := fmt.Sprint((*profile)["status"])
+		return query.NewQueryParams(query.WithActivate(true), query.WithStatus(status))
 	}
 
-	return query.NewQueryParams(query.WithActivate(true), query.WithStatus(status))
+	return query.NewQueryParams(query.WithActivate(true))
+
 }
