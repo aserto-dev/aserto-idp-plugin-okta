@@ -6,6 +6,7 @@ require (
 	github.com/aserto-dev/go-grpc v0.0.10
 	github.com/aserto-dev/idp-plugin-sdk v0.0.2
 	github.com/aserto-dev/mage-loot v0.4.12
+	github.com/dongri/phonenumber v0.0.0-20210805005246-531b48ff7473
 	github.com/hashicorp/go-multierror v1.0.0
 	github.com/magefile/mage v1.11.0
 	github.com/okta/okta-sdk-golang/v2 v2.6.2
