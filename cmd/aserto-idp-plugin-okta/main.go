@@ -9,8 +9,10 @@ import (
 
 func main() {
 
+	oktaPlugin := srv.NewOktaPlugin()
+
 	options := &plugin.PluginOptions{
-		PluginHandler: &srv.OktaPlugin{},
+		PluginHandler: oktaPlugin,
 	}
 
 	err := plugin.Serve(options)

@@ -103,6 +103,7 @@ func Transform(in *okta.User) *api.User {
 			"login",
 			"email",
 			"firstName",
+			"status",
 			"lastName":
 			continue
 		default:

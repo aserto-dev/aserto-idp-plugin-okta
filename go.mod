@@ -7,6 +7,7 @@ require (
 	github.com/aserto-dev/idp-plugin-sdk v0.0.2
 	github.com/aserto-dev/mage-loot v0.4.12
 	github.com/dongri/phonenumber v0.0.0-20210805005246-531b48ff7473
+	github.com/golang/mock v1.4.4
 	github.com/google/wire v0.5.0
 	github.com/hashicorp/go-multierror v1.0.0
 	github.com/magefile/mage v1.11.0

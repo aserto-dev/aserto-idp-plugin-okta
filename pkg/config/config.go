@@ -1,4 +1,4 @@
-package srv
+package config
 
 import (
 	"context"
@@ -22,15 +22,12 @@ func GetVersion() (string, string, string) {
 }
 
 type OktaConfig struct {
-	OktaDomain       string           `description:"Okta domain" kind:"attribute" mode:"normal" readonly:"false" name:"okta_domain"`
-	OktaApiToken     string           `description:"Okta API Token" kind:"attribute" mode:"normal" readonly:"false" name:"okta_api_token"`
-	oktaUserResource OktaUserResource `aserto:-`
+	OktaDomain   string `description:"Okta domain" kind:"attribute" mode:"normal" readonly:"false" name:"okta_domain"`
+	OktaApiToken string `description:"Okta API Token" kind:"attribute" mode:"normal" readonly:"false" name:"okta_api_token"`
 }
 
-func NewOktaConfig(oktaURS OktaUserResource) *OktaConfig {
-	return &OktaConfig{
-		oktaUserResource: oktaURS,
-	}
+func NewOktaConfig() *OktaConfig {
+	return &OktaConfig{}
 }
 
 func (c *OktaConfig) Validate() error {
@@ -53,8 +50,7 @@ func (c *OktaConfig) Validate() error {
 	}
 
 	filter := query.NewQueryParams(query.WithLimit(1))
-	oktaUser := NewOktaUserResource(*client)
-	_, _, errReq := oktaUser.ListUsers(ctx, filter)
+	_, _, errReq := client.User.ListUsers(ctx, filter)
 
 	if errReq != nil {
 		return status.Errorf(codes.Internal, "failed to retrieve user from Okta: %s", errReq.Error())

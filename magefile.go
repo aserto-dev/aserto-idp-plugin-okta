@@ -49,6 +49,10 @@ func Test() error {
 	return common.Test()
 }
 
+func Generate() error {
+	return common.Generate()
+}
+
 // All runs all targets in the appropriate order.
 // The targets are run in the following order:
 // deps, generate, lint, test, build, dockerImage
