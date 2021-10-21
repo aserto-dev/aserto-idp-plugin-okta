@@ -15,19 +15,18 @@ import (
 )
 
 type OktaPlugin struct {
-	Config       *OktaConfig
-	client       *okta.Client
+	Client       OktaClient
 	ctx          context.Context
 	response     *okta.Response
 	users        []*okta.User
 	finishedRead bool
 }
 
-func NewOktaPlugin() *OktaPlugin {
-	return &OktaPlugin{
-		Config: &OktaConfig{},
-	}
-}
+// func NewOktaPlugin(oktaClient OktaClient) *OktaPlugin {
+// 	return &OktaPlugin{
+// 		client: oktaClient,
+// 	}
+// }
 
 func (s *OktaPlugin) GetConfig() plugin.PluginConfig {
 	return &OktaConfig{}
@@ -74,11 +73,7 @@ func (o *OktaPlugin) Read() ([]*api.User, error) {
 
 		for _, u := range oktaUsers {
 
-			user, err := Transform(u)
-			if err != nil {
-				errs = multierror.Append(errs, err)
-			}
-
+			user := Transform(u)
 			users = append(users, user)
 		}
 
@@ -100,11 +95,7 @@ func (o *OktaPlugin) Read() ([]*api.User, error) {
 	}
 
 	for _, u := range o.users {
-		user, err := Transform(u)
-		if err != nil {
-			errs = multierror.Append(errs, err)
-		}
-
+		user := Transform(u)
 		users = append(users, user)
 	}
 
