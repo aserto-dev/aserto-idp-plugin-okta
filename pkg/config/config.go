@@ -1,4 +1,4 @@
-package srv
+package config
 
 import (
 	"context"
@@ -24,6 +24,10 @@ func GetVersion() (string, string, string) {
 type OktaConfig struct {
 	OktaDomain   string `description:"Okta domain" kind:"attribute" mode:"normal" readonly:"false" name:"okta_domain"`
 	OktaApiToken string `description:"Okta API Token" kind:"attribute" mode:"normal" readonly:"false" name:"okta_api_token"`
+}
+
+func NewOktaConfig() *OktaConfig {
+	return &OktaConfig{}
 }
 
 func (c *OktaConfig) Validate() error {

@@ -19,8 +19,13 @@ const (
 
 func ConstructOktaProfile(in *api.User) *okta.UserProfile {
 	names := strings.Split(in.DisplayName, " ")
+
+	lastName := ""
+
+	if len(names) > 1 {
+		lastName = names[1]
+	}
 	firstName := names[0]
-	lastName := names[1]
 
 	profile := okta.UserProfile{}
 	profile["firstName"] = firstName
@@ -52,7 +57,7 @@ func TransformToOktaUserReq(in *api.User) *okta.CreateUserRequest {
 }
 
 // Transform Okta user definition into Aserto Edge User object definition.
-func Transform(in *okta.User) (*api.User, error) {
+func Transform(in *okta.User) *api.User {
 
 	profileMap := in.Profile
 	displayName := fmt.Sprintf("%s %s", (*profileMap)["firstName"], (*profileMap)["lastName"])
@@ -98,6 +103,7 @@ func Transform(in *okta.User) (*api.User, error) {
 			"login",
 			"email",
 			"firstName",
+			"status",
 			"lastName":
 			continue
 		default:
@@ -132,7 +138,7 @@ func Transform(in *okta.User) (*api.User, error) {
 		}
 	}
 
-	return &user, nil
+	return &user
 }
 
 func CreateQueryWithStatus(profile *okta.UserProfile) *query.Params {

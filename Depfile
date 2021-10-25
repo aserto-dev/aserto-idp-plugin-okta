@@ -12,3 +12,6 @@ go:
   goreleaser:
     importPath: github.com/goreleaser/goreleaser
     version: "v0.174.2"
+  mockgen:
+    importPath: github.com/golang/mock/mockgen
+    version: "v1.6.0"
