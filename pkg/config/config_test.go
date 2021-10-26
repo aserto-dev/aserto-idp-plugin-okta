@@ -1,6 +1,7 @@
 package config
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -10,7 +11,7 @@ func TestValidateWithEmptyDomain(t *testing.T) {
 	assert := require.New(t)
 	config := OktaConfig{
 		OktaDomain:   "",
-		OktaApiToken: "test",
+		OktaApiToken: "token",
 	}
 	err := config.Validate()
 
@@ -21,7 +22,7 @@ func TestValidateWithEmptyDomain(t *testing.T) {
 func TestValidateWithEmptyToken(t *testing.T) {
 	assert := require.New(t)
 	config := OktaConfig{
-		OktaDomain:   "dafsdf",
+		OktaDomain:   "domain",
 		OktaApiToken: "",
 	}
 
@@ -29,6 +30,20 @@ func TestValidateWithEmptyToken(t *testing.T) {
 
 	assert.NotNil(t, err)
 	assert.Equal("rpc error: code = InvalidArgument desc = no okta api token was provided", err.Error())
+}
+
+func TestValidateWithInvalidCredentials(t *testing.T) {
+	assert := require.New(t)
+	config := OktaConfig{
+		OktaDomain:   "domain",
+		OktaApiToken: "token",
+	}
+
+	err := config.Validate()
+
+	assert.NotNil(t, err)
+	r, _ := regexp.Compile("Internal desc = failed to retrieve user from Okta")
+	assert.Regexp(r, err.Error())
 }
 
 func TestDecription(t *testing.T) {
