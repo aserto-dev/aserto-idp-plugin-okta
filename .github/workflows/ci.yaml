@@ -6,6 +6,9 @@ on:
   push:
     branches:
       - main
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*
   # Run tests for PRs
   pull_request:
     branches:
@@ -116,5 +119,5 @@ jobs:
           git config --global url."git@github.com:".insteadOf https://github.com/
           git config --global user.email "github-bot@aserto.com"
           git config --global user.name "Aserto Bot"
-          eval `ssh-agent`
+
           go run mage.go deps release
