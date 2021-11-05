@@ -20,9 +20,9 @@ const (
 func ConstructOktaProfile(in *api.User) *okta.UserProfile {
 	names := strings.Split(in.DisplayName, " ")
 
-	lastName := ""
+	lastName := " "
 
-	if len(names) > 1 {
+	if len(names) > 1 && names[1] != "" {
 		lastName = names[1]
 	}
 	firstName := names[0]
@@ -34,10 +34,14 @@ func ConstructOktaProfile(in *api.User) *okta.UserProfile {
 	profile["login"] = in.Email
 
 	for key, value := range in.Attributes.Properties.Fields {
-		if key == "status" {
-			profile["status"] = strings.ToUpper(value.GetStringValue())
-		} else {
+		if key != "status" && key != "phone" {
 			profile[key] = value
+		}
+	}
+
+	for key, value := range in.Identities {
+		if value.Kind == api.IdentityKind_IDENTITY_KIND_PHONE {
+			profile["mobilePhone"] = key
 		}
 	}
 

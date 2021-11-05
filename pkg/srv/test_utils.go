@@ -9,7 +9,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func CreateTestApiUser(id, displayName, email, status string) *api.User {
+func CreateTestApiUser(id, displayName, email, status, mobilePhone string) *api.User {
 	user := api.User{
 		Id:          id,
 		DisplayName: displayName,
@@ -29,6 +29,12 @@ func CreateTestApiUser(id, displayName, email, status string) *api.User {
 	}
 
 	user.Attributes.Properties.Fields["status"] = structpb.NewStringValue(status)
+
+	user.Identities[mobilePhone] = &api.IdentitySource{
+		Kind:     api.IdentityKind_IDENTITY_KIND_PHONE,
+		Provider: provider,
+		Verified: true,
+	}
 
 	return &user
 }

@@ -10,7 +10,7 @@ import (
 
 func TestConstructOktaProfile(t *testing.T) {
 	assert := require.New(t)
-	apiUser := CreateTestApiUser("1", "First Last", "testemail@test.com", "active")
+	apiUser := CreateTestApiUser("1", "First Last", "testemail@test.com", "active", "40772233223")
 
 	oktaProfile := ConstructOktaProfile(apiUser)
 
@@ -19,22 +19,22 @@ func TestConstructOktaProfile(t *testing.T) {
 	assert.Equal("Last", (*oktaProfile)["lastName"], "should correctly detect the last name")
 	assert.Equal("testemail@test.com", (*oktaProfile)["email"], "should correctly populate the email")
 	assert.Equal("testemail@test.com", (*oktaProfile)["login"], "should correctly populate the login")
-	assert.Equal("ACTIVE", (*oktaProfile)["status"], "should correctly transform and populate the status")
+	assert.Equal("40772233223", (*oktaProfile)["mobilePhone"], "should correctly populate the phone number")
 }
 
 func TestConstructOktaProfileWithUserHavingOnlyFirstName(t *testing.T) {
 	assert := require.New(t)
-	apiUserWOLastName := CreateTestApiUser("1", "First", "testemail@test.com", "active")
+	apiUserWOLastName := CreateTestApiUser("1", "First", "testemail@test.com", "active", "40772233223")
 
 	oktaProfileWOLastName := ConstructOktaProfile(apiUserWOLastName)
 
 	assert.Equal("First", (*oktaProfileWOLastName)["firstName"], "should detect the first name and not be empty")
-	assert.Equal("", (*oktaProfileWOLastName)["lastName"], "should detect the last name and be empty")
+	assert.Equal(" ", (*oktaProfileWOLastName)["lastName"], "should detect the last name and be a white space")
 }
 
 func TestTransformToOktaUserReq(t *testing.T) {
 	assert := require.New(t)
-	apiUser := CreateTestApiUser("1", "First Last", "testemail@test.com", "active")
+	apiUser := CreateTestApiUser("1", "First Last", "testemail@test.com", "active", "40772233223")
 
 	oktaUserReq := TransformToOktaUserReq(apiUser)
 
