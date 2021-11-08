@@ -182,7 +182,7 @@ func TestWriteWithNewUserFail(t *testing.T) {
 	p := NewTestOktaPlugin(gomock.NewController(t), nil)
 	err := p.Open(&config.OktaConfig{}, plugin.OperationTypeRead)
 	assert.Nil(err)
-	user := CreateTestApiUser("1", "Name", "mail", "active")
+	user := CreateTestApiUser("1", "Name", "mail", "active", "40772233223")
 
 	p.client.(*oktaclient.MockOktaClient).EXPECT().GetUser(p.ctx, user.Id).Return(nil, nil, errors.New("Error1"))
 	p.client.(*oktaclient.MockOktaClient).EXPECT().CreateUser(p.ctx, gomock.Any(), gomock.Any()).Return(nil, nil, errors.New("Error2"))
@@ -198,7 +198,7 @@ func TestWriteWithNewUserSuccess(t *testing.T) {
 	p := NewTestOktaPlugin(gomock.NewController(t), nil)
 	err := p.Open(&config.OktaConfig{}, plugin.OperationTypeRead)
 	assert.Nil(err)
-	user := CreateTestApiUser("1", "Name", "mail", "active")
+	user := CreateTestApiUser("1", "Name", "mail", "active", "40772233223")
 
 	p.client.(*oktaclient.MockOktaClient).EXPECT().GetUser(p.ctx, user.Id).Return(nil, nil, errors.New("Error1"))
 	p.client.(*oktaclient.MockOktaClient).EXPECT().CreateUser(p.ctx, gomock.Any(), gomock.Any()).Return(nil, nil, nil)
@@ -213,7 +213,7 @@ func TestWriteWithExistingUserFail(t *testing.T) {
 	p := NewTestOktaPlugin(gomock.NewController(t), nil)
 	err := p.Open(&config.OktaConfig{}, plugin.OperationTypeRead)
 	assert.Nil(err)
-	user := CreateTestApiUser("1", "Name", "mail", "active")
+	user := CreateTestApiUser("1", "Name", "mail", "active", "40772233223")
 
 	p.client.(*oktaclient.MockOktaClient).EXPECT().GetUser(p.ctx, user.Id).Return(nil, nil, nil)
 	p.client.(*oktaclient.MockOktaClient).EXPECT().UpdateUser(p.ctx, gomock.Any(), gomock.Any(), gomock.Any()).Return(
@@ -230,7 +230,7 @@ func TestWriteWithExistingUserSuccess(t *testing.T) {
 	p := NewTestOktaPlugin(gomock.NewController(t), nil)
 	err := p.Open(&config.OktaConfig{}, plugin.OperationTypeRead)
 	assert.Nil(err)
-	user := CreateTestApiUser("1", "Name", "mail", "active")
+	user := CreateTestApiUser("1", "Name", "mail", "active", "40772233223")
 
 	p.client.(*oktaclient.MockOktaClient).EXPECT().GetUser(p.ctx, user.Id).Return(nil, nil, nil)
 	p.client.(*oktaclient.MockOktaClient).EXPECT().UpdateUser(p.ctx, gomock.Any(), gomock.Any(), gomock.Any()).Return(
