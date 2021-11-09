@@ -78,3 +78,28 @@ func TestTransformWithDeactivatedUser(t *testing.T) {
 	assert.Equal("deactivated", (*apiUser).Attributes.Properties.Fields["status"].GetStringValue(), "should add status to attributes")
 	assert.False((*apiUser).Identities["1"].Verified, "should add user id as an unverified identity")
 }
+
+func TestTransformWithUserCustomAttributes(t *testing.T) {
+	assert := require.New(t)
+
+	var roles []interface{}
+	roles = append(roles, "admin", "plan")
+	oktaUser := CreateTestOktaUserWithCustomAttribute("roles", roles)
+
+	apiUser := Transform(oktaUser)
+
+	rolesTranslated := (*apiUser).Attributes.Properties.Fields["roles"].GetListValue().Values
+	assert.Equal(roles[0], rolesTranslated[0].GetStringValue(), "should add custom attributes with proper type")
+}
+
+func TestTransformWithInvalidTypeUserCustomAttributes(t *testing.T) {
+	assert := require.New(t)
+
+	roles := [2]string{"admin", "plan"}
+	oktaUser := CreateTestOktaUserWithCustomAttribute("roles", roles)
+
+	apiUser := Transform(oktaUser)
+
+	rolesTranslated := (*apiUser).Attributes.Properties.Fields["roles"]
+	assert.Nil(rolesTranslated)
+}
