@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	api "github.com/aserto-dev/go-grpc/aserto/api/v1"
+	"github.com/rs/zerolog/log"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -99,7 +100,6 @@ func Transform(in *okta.User) *api.User {
 	user.Attributes.Properties.Fields["status"] = structpb.NewStringValue(status)
 
 	for key, value := range *profileMap {
-		stringValue := fmt.Sprint(value)
 
 		switch key {
 		case
@@ -111,8 +111,15 @@ func Transform(in *okta.User) *api.User {
 			"lastName":
 			continue
 		default:
-			if value != nil && stringValue != "" {
-				user.Attributes.Properties.Fields[key] = structpb.NewStringValue(stringValue)
+			if value != nil {
+				structValue, err := structpb.NewValue(value)
+				if err != nil {
+					msg := fmt.Sprintf("%s okta custom attribute wasn't successfuly converted and won't be added to the api user's attributes. Cause: %s", key, err.Error())
+					log.Warn().Msg(msg)
+					continue
+				}
+
+				user.Attributes.Properties.Fields[key] = structValue
 			}
 		}
 	}

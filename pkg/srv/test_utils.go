@@ -65,3 +65,10 @@ func CreateTestOktaUser(id, status, firstName, lastName, email, mobilePhone stri
 
 	return &user
 }
+
+func CreateTestOktaUserWithCustomAttribute(key string, value interface{}) *okta.User {
+	oktaUser := CreateTestOktaUser("1", "ACTIVE", "First", "Last", "testemail@test.com", "+40772233223")
+	(*oktaUser.Profile)[key] = value
+
+	return oktaUser
+}
