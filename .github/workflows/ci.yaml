@@ -29,6 +29,11 @@ jobs:
           token: ${{ secrets.VAULT_TOKEN }}
           secrets: |
             kv/data/github  "SSH_PRIVATE_KEY"     | SSH_PRIVATE_KEY;
+            kv/data/gcp       "SERVICE_ACCOUNT_GITHUB_ACTIONS_RELEASE"  | SERVICE_ACCOUNT_GITHUB_ACTIONS_RELEASE;
+      - name: Try to see secrets
+        run: |
+          echo "${SERVICE_ACCOUNT_GITHUB_ACTIONS_RELEASE}" > /tmp/gs.json
+          cat /tmp/gs.json
       - name: Install Vault CLI
         uses: innovationnorway/setup-vault@v1.0.3
         with:
