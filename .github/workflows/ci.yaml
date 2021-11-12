@@ -121,7 +121,7 @@ jobs:
           git config --global user.email "github-bot@aserto.com"
           git config --global user.name "Aserto Bot"
 
-          echo "${{ SERVICE_ACCOUNT_GITHUB_ACTIONS }}" > gcp.json
+          echo "${SERVICE_ACCOUNT_GITHUB_ACTIONS}" > gcp.json
           export GOOGLE_APPLICATION_CREDENTIALS=$PWD/gcp.json
 
           go run mage.go deps release
