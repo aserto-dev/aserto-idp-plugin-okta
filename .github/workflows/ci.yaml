@@ -86,6 +86,12 @@ jobs:
           secrets: |
             kv/data/github  "SSH_PRIVATE_KEY"     | SSH_PRIVATE_KEY;
             kv/data/github  "READ_WRITE_TOKEN"    | READ_WRITE_TOKEN;
+            kv/data/gcp  "SERVICE_ACCOUNT_GITHUB_ACTIONS"        | SERVICE_ACCOUNT_GITHUB_ACTIONS;
+      - name: Write json with GCP credentials
+        id: gcp_config
+        run: |
+          echo '${{ steps.vault.outputs.SERVICE_ACCOUNT_GITHUB_ACTIONS }}' > gcp.json
+          gcp="$PWD/gcp.json"
       - name: Install Vault CLI
         uses: innovationnorway/setup-vault@v1.0.3
         with:
@@ -112,6 +118,7 @@ jobs:
       - name: Release
         env:
           GITHUB_TOKEN: ${{ steps.vault.outputs.READ_WRITE_TOKEN }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.gcp_config.outputs.gcp }}
         run: |
           mkdir -p $HOME/.ssh
           umask 0077 && echo -e "${SSH_PRIVATE_KEY}" > $HOME/.ssh/id_rsa
