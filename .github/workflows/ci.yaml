@@ -84,8 +84,9 @@ jobs:
           url: ${{ env.VAULT_ADDR }}
           token: ${{ secrets.VAULT_TOKEN }}
           secrets: |
-            kv/data/github  "SSH_PRIVATE_KEY"   | SSH_PRIVATE_KEY;
-            kv/data/github  "READ_WRITE_TOKEN"  | READ_WRITE_TOKEN;
+            kv/data/github    "SSH_PRIVATE_KEY"                 | SSH_PRIVATE_KEY;
+            kv/data/github    "READ_WRITE_TOKEN"                | READ_WRITE_TOKEN;
+            kv/data/write-gcp "SERVICE_ACCOUNT_GITHUB_ACTIONS"  | SERVICE_ACCOUNT_GITHUB_ACTIONS;
       - name: Install Vault CLI
         uses: innovationnorway/setup-vault@v1.0.3
         with:
@@ -112,7 +113,6 @@ jobs:
       - name: Release
         env:
           GITHUB_TOKEN: ${{ steps.vault.outputs.READ_WRITE_TOKEN }}
-          GCP_JSON: ${{ secrets.GCP_CREDENTIALS }}
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/gs.json
         run: |
           mkdir -p $HOME/.ssh
@@ -122,6 +122,6 @@ jobs:
           git config --global user.email "github-bot@aserto.com"
           git config --global user.name "Aserto Bot"
 
-          echo "$GCP_JSON" > /tmp/gs.json
+          echo "${SERVICE_ACCOUNT_GITHUB_ACTIONS}" > /tmp/gs.json
 
           go run mage.go deps release
