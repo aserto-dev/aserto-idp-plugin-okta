@@ -31,10 +31,6 @@ func Clean() error {
 
 // Release releases the project.
 func Release() error {
-	opts := os.Getenv("RELEASE_FLAGS")
-	if opts != "" {
-		return common.Release(opts)
-	}
 	return common.Release()
 }
 
