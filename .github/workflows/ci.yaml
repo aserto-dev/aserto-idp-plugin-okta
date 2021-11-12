@@ -120,6 +120,7 @@ jobs:
       - name: Release
         env:
           GITHUB_TOKEN: ${{ steps.vault.outputs.READ_WRITE_TOKEN }}
+          RELEASE_FLAGS: "--skip-validate"
         run: |
           mkdir -p $HOME/.ssh
           umask 0077 && echo -e "${SSH_PRIVATE_KEY}" > $HOME/.ssh/id_rsa
