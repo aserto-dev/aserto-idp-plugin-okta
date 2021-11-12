@@ -91,7 +91,7 @@ jobs:
         id: gcp_config
         run: |
           echo '${{ steps.vault.outputs.SERVICE_ACCOUNT_GITHUB_ACTIONS }}' > gcp.json
-          gcp="$PWD/gcp.json"
+          echo ::set-output name=gcp::$($PWD/gcp.json)
       - name: Install Vault CLI
         uses: innovationnorway/setup-vault@v1.0.3
         with:
