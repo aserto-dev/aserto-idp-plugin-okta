@@ -85,7 +85,7 @@ jobs:
           token: ${{ secrets.VAULT_TOKEN }}
           secrets: |
             kv/data/github    "SSH_PRIVATE_KEY"                         | SSH_PRIVATE_KEY;
-            kv/data/github    "ROOT_TOKEN"                              | ROOT_TOKEN;
+            kv/data/github    "READ_WRITE_TOKEN"                        | READ_WRITE_TOKEN;
             kv/data/gcp       "SERVICE_ACCOUNT_GITHUB_ACTIONS_RELEASE"  | SERVICE_ACCOUNT_GITHUB_ACTIONS_RELEASE;
       - name: Install Vault CLI
         uses: innovationnorway/setup-vault@v1.0.3
@@ -112,7 +112,7 @@ jobs:
             ${{ runner.os }}-go-
       - name: Release
         env:
-          GITHUB_TOKEN: ${{ steps.vault.outputs.ROOT_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.vault.outputs.READ_WRITE_TOKEN }}
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/gs.json
         run: |
           mkdir -p $HOME/.ssh
