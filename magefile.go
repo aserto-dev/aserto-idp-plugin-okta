@@ -3,11 +3,14 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"os"
 	"runtime"
 
 	"github.com/aserto-dev/mage-loot/common"
 	"github.com/aserto-dev/mage-loot/deps"
+	"github.com/aserto-dev/sver/pkg/sver"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 )
@@ -18,6 +21,15 @@ func init() {
 	// Set private repositories
 	os.Setenv("GOPRIVATE", "github.com/aserto-dev")
 }
+
+var (
+	oras         = deps.BinDep("oras")
+	mediaType    = ":application/vnd.unknown.layer.v1+txt"
+	pluginName   = "aserto-idp-plugin-okta_"
+	execLocation = "dist/" + pluginName
+	ghName       = "ghcr.io/aserto-dev/" + pluginName
+	osArch       = []string{"linux_arm64", "linux_amd64", "darwin_amd64", "darwin_arm64", "windows_amd64"}
+)
 
 // Build builds all binaries in ./cmd.
 func Build() error {
@@ -68,4 +80,31 @@ func All() error {
 
 func Run() error {
 	return sh.RunV("./bin/" + runtime.GOOS + "-" + runtime.GOARCH + "/aserto-idp")
+}
+
+func Publish() error {
+
+	username := os.Getenv("DOCKER_USERNAME")
+	if username == "" {
+		return errors.New("env var DOCKER_USERNAME is not set")
+	}
+	password := os.Getenv("DOCKER_PASSWORD")
+	if password == "" {
+		return errors.New("env var DOCKER_PASSWORD is not set")
+	}
+
+	version, err := sver.CurrentVersion(true, true)
+	fmt.Println(version)
+	if err != nil {
+		return fmt.Errorf("couldn't calculate current version: %w", err)
+	}
+
+	for _, arch := range osArch {
+		err = oras("push", "-u", username, "-p", password, ghName+arch+":"+version, execLocation+arch+mediaType)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
