@@ -245,7 +245,8 @@ func TestClose(t *testing.T) {
 	assert := require.New(t)
 	p := NewTestOktaPlugin(gomock.NewController(t), nil)
 
-	err := p.Close()
+	stats, err := p.Close()
 
+	assert.Nil(stats)
 	assert.Nil(err)
 }

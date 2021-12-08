@@ -1,23 +1,39 @@
-// +build mage
+//go:build mage
 
 package main
 
 import (
+	"errors"
+	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 
 	"github.com/aserto-dev/mage-loot/common"
 	"github.com/aserto-dev/mage-loot/deps"
+	"github.com/aserto-dev/sver/pkg/sver"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 )
 
 func init() {
 	// Set go version for docker builds
-	os.Setenv("GO_VERSION", "1.16")
+	os.Setenv("GO_VERSION", "1.17")
 	// Set private repositories
 	os.Setenv("GOPRIVATE", "github.com/aserto-dev")
 }
+
+var (
+	oras         = deps.BinDep("oras")
+	mediaType    = ":application/vnd.unknown.layer.v1+txt"
+	execLocation = filepath.Join("dist", "aserto-idp-plugin-okta_")
+	ghName       = "ghcr.io/aserto-dev/aserto-idp-plugins_"
+	osMap        = map[string][]string{
+		"linux":   {"arm64", "amd64"},
+		"darwin":  {"arm64", "amd64"},
+		"windows": {"amd64"},
+	}
+)
 
 // Build builds all binaries in ./cmd.
 func Build() error {
@@ -68,4 +84,34 @@ func All() error {
 
 func Run() error {
 	return sh.RunV("./bin/" + runtime.GOOS + "-" + runtime.GOARCH + "/aserto-idp")
+}
+
+func Publish() error {
+
+	username := os.Getenv("DOCKER_USERNAME")
+	if username == "" {
+		return errors.New("env var DOCKER_USERNAME is not set")
+	}
+	password := os.Getenv("DOCKER_PASSWORD")
+	if password == "" {
+		return errors.New("env var DOCKER_PASSWORD is not set")
+	}
+
+	version, err := sver.CurrentVersion(true, true)
+	if err != nil {
+		return fmt.Errorf("couldn't calculate current version: %w", err)
+	}
+
+	for os, archs := range osMap {
+		for _, arch := range archs {
+			grName := fmt.Sprintf("%s%s_%s:%s-%s", ghName, os, arch, "okta", version)
+			location := fmt.Sprintf("%s%s_%s%s", execLocation, os, arch, mediaType)
+			err = oras("push", "-u", username, "-p", password, grName, location)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
