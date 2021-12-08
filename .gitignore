@@ -16,4 +16,5 @@
 dist/
 .vscode/
 bin/
+.ext/
 cover.out

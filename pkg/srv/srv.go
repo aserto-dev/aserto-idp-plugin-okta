@@ -142,8 +142,8 @@ func (o *OktaPlugin) Delete(id string) error {
 	return nil
 }
 
-func (o *OktaPlugin) Close() error {
-	return nil
+func (o *OktaPlugin) Close() (*plugin.Stats, error) {
+	return nil, nil
 }
 
 func NormalPager() OktaPager {
