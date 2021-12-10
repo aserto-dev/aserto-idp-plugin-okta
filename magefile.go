@@ -24,11 +24,11 @@ func init() {
 }
 
 var (
-	oras         = deps.BinDep("oras")
-	mediaType    = ":application/vnd.unknown.layer.v1+txt"
-	execLocation = filepath.Join("dist", "aserto-idp-plugin-okta_")
-	ghName       = "ghcr.io/aserto-dev/aserto-idp-plugins_"
-	osMap        = map[string][]string{
+	oras       = deps.BinDep("oras")
+	mediaType  = "application/vnd.unknown.layer.v1+txt"
+	pluginName = "aserto-idp-plugin-okta"
+	ghName     = "ghcr.io/aserto-dev/aserto-idp-plugins_"
+	osMap      = map[string][]string{
 		"linux":   {"arm64", "amd64"},
 		"darwin":  {"arm64", "amd64"},
 		"windows": {"amd64"},
@@ -102,10 +102,16 @@ func Publish() error {
 		return fmt.Errorf("couldn't calculate current version: %w", err)
 	}
 
-	for os, archs := range osMap {
+	pwd := os.Getenv("PWD")
+	defer os.Chdir(pwd)
+
+	for operatingSystem, archs := range osMap {
 		for _, arch := range archs {
-			grName := fmt.Sprintf("%s%s_%s:%s-%s", ghName, os, arch, "okta", version)
-			location := fmt.Sprintf("%s%s_%s%s", execLocation, os, arch, mediaType)
+			buildPath := filepath.Join(pwd, "dist", pluginName+"_"+operatingSystem+"_"+arch)
+			os.Chdir(buildPath)
+			grName := fmt.Sprintf("%s%s_%s:%s-%s", ghName, operatingSystem, arch, "okta", version)
+			location := fmt.Sprintf("%s:%s", pluginName, mediaType)
+
 			err = oras("push", "-u", username, "-p", password, grName, location)
 			if err != nil {
 				return err

@@ -20,9 +20,9 @@ builds:
     ldflags:
       - -s
       - -w
-      - -X pkg/config.ver={{.Version}}
-      - -X pkg/config.commit={{.ShortCommit}}
-      - -X pkg/config.date={{.Date}}
+      - -X github.com/aserto-dev/aserto-idp-plugin-okta/pkg/config.ver={{.Version}}
+      - -X github.com/aserto-dev/aserto-idp-plugin-okta/pkg/config.commit={{.ShortCommit}}
+      - -X github.com/aserto-dev/aserto-idp-plugin-okta/pkg/config.date={{.Date}}
     mod_timestamp: "{{ .CommitTimestamp }}"
 
 archives:
