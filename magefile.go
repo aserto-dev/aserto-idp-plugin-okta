@@ -33,6 +33,12 @@ var (
 		"darwin":  {"arm64", "amd64"},
 		"windows": {"amd64"},
 	}
+
+	extensions = map[string]string{
+		"linux":   "",
+		"darwin":  "",
+		"windows": ".exe",
+	}
 )
 
 // Build builds all binaries in ./cmd.
@@ -53,7 +59,7 @@ func Release() error {
 // BuildAll builds all binaries in ./cmd for
 // all configured operating systems and architectures.
 func BuildAll() error {
-	return common.BuildAll()
+	return common.BuildAllReleaser()
 }
 
 func Deps() {
@@ -110,7 +116,7 @@ func Publish() error {
 			buildPath := filepath.Join(pwd, "dist", pluginName+"_"+operatingSystem+"_"+arch)
 			os.Chdir(buildPath)
 			grName := fmt.Sprintf("%s%s_%s:%s-%s", ghName, operatingSystem, arch, "okta", version)
-			location := fmt.Sprintf("%s:%s", pluginName, mediaType)
+			location := fmt.Sprintf("%s%s:%s", pluginName, extensions[operatingSystem], mediaType)
 
 			err = oras("push", "-u", username, "-p", password, grName, location)
 			if err != nil {
