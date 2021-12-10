@@ -29,6 +29,10 @@ func (s *OktaPlugin) GetConfig() plugin.PluginConfig {
 	return &config.OktaConfig{}
 }
 
+func (s *OktaPlugin) GetVersion() (string, string, string) {
+	return config.GetVersion()
+}
+
 func (o *OktaPlugin) Open(cfg plugin.PluginConfig, op plugin.OperationType) error {
 	config, ok := cfg.(*config.OktaConfig)
 
