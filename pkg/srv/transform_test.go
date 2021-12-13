@@ -76,7 +76,8 @@ func TestTransformWithDeactivatedUser(t *testing.T) {
 
 	assert.Equal("1", (*apiUser).Id, "should correctly detect the id")
 	assert.Equal("deactivated", (*apiUser).Attributes.Properties.Fields["status"].GetStringValue(), "should add status to attributes")
-	assert.False((*apiUser).Identities["1"].Verified, "should add user id as an unverified identity")
+	assert.True((*apiUser).Identities["1"].Verified, "should always add user id as verified")
+	assert.False((*apiUser).Identities["testemail@test.com"].Verified, "should add user email as unverified")
 }
 
 func TestTransformWithUserCustomAttributes(t *testing.T) {

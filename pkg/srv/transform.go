@@ -127,7 +127,7 @@ func Transform(in *okta.User) *api.User {
 	user.Identities[in.Id] = &api.IdentitySource{
 		Kind:     api.IdentityKind_IDENTITY_KIND_PID,
 		Provider: provider,
-		Verified: verified,
+		Verified: true,
 	}
 
 	user.Identities[email] = &api.IdentitySource{
