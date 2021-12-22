@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/aserto-dev/idp-plugin-sdk/plugin"
 	"github.com/okta/okta-sdk-golang/v2/okta"
 	"github.com/okta/okta-sdk-golang/v2/okta/query"
 	"google.golang.org/grpc/codes"
@@ -30,7 +31,7 @@ func NewOktaConfig() *OktaConfig {
 	return &OktaConfig{}
 }
 
-func (c *OktaConfig) Validate() error {
+func (c *OktaConfig) Validate(opType plugin.OperationType) error {
 
 	if c.OktaDomain == "" {
 		return status.Error(codes.InvalidArgument, "no okta domain was provided")

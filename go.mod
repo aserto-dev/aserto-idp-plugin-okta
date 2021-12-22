@@ -3,20 +3,20 @@ module github.com/aserto-dev/aserto-idp-plugin-okta
 go 1.17
 
 require (
-	github.com/aserto-dev/go-grpc v0.0.26
-	github.com/aserto-dev/idp-plugin-sdk v0.0.5
+	github.com/aserto-dev/go-grpc v0.0.33
+	github.com/aserto-dev/idp-plugin-sdk v0.0.6
 	github.com/aserto-dev/mage-loot v0.4.16
 	github.com/aserto-dev/sver v1.3.9
 	github.com/dongri/phonenumber v0.0.0-20210805005246-531b48ff7473
 	github.com/golang/mock v1.6.0
 	github.com/google/wire v0.5.0
 	github.com/hashicorp/go-multierror v1.0.0
-	github.com/magefile/mage v1.11.0
+	github.com/magefile/mage v1.12.0
 	github.com/okta/okta-sdk-golang/v2 v2.9.1
 	github.com/rs/zerolog v1.26.0
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/sys v0.0.0-20211124211545-fe61309f8881 // indirect
-	google.golang.org/grpc v1.42.0
+	google.golang.org/grpc v1.43.0
 	google.golang.org/protobuf v1.27.1
 )
 
@@ -34,7 +34,7 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-containerregistry v0.7.0 // indirect
 	github.com/google/subcommands v1.0.1 // indirect
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.5.0 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.1 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-hclog v0.16.2 // indirect
 	github.com/hashicorp/go-plugin v1.4.3 // indirect
@@ -67,7 +67,7 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.7 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
-	google.golang.org/genproto v0.0.0-20211111162719-482062a4217b // indirect
+	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa // indirect
 	gopkg.in/square/go-jose.v2 v2.5.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
