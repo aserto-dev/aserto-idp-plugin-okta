@@ -25,8 +25,8 @@ type OktaClient interface {
 func NewOktaClient(ctx context.Context, cfg *config.OktaConfig) (OktaClient, error) {
 	_, client, err := okta.NewClient(
 		ctx,
-		okta.WithOrgUrl(fmt.Sprintf("https://%s", cfg.OktaDomain)),
-		okta.WithToken(cfg.OktaApiToken),
+		okta.WithOrgUrl(fmt.Sprintf("https://%s", cfg.Domain)),
+		okta.WithToken(cfg.ApiToken),
 	)
 
 	if err != nil {
