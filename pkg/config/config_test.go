@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/aserto-dev/idp-plugin-sdk/plugin"
 	"github.com/stretchr/testify/require"
 )
 
@@ -13,7 +14,7 @@ func TestValidateWithEmptyDomain(t *testing.T) {
 		OktaDomain:   "",
 		OktaApiToken: "token",
 	}
-	err := config.Validate()
+	err := config.Validate(plugin.OperationTypeRead)
 
 	assert.NotNil(err)
 	assert.Equal("rpc error: code = InvalidArgument desc = no okta domain was provided", err.Error())
@@ -26,7 +27,7 @@ func TestValidateWithEmptyToken(t *testing.T) {
 		OktaApiToken: "",
 	}
 
-	err := config.Validate()
+	err := config.Validate(plugin.OperationTypeRead)
 
 	assert.NotNil(t, err)
 	assert.Equal("rpc error: code = InvalidArgument desc = no okta api token was provided", err.Error())
@@ -39,7 +40,7 @@ func TestValidateWithInvalidCredentials(t *testing.T) {
 		OktaApiToken: "token",
 	}
 
-	err := config.Validate()
+	err := config.Validate(plugin.OperationTypeRead)
 
 	assert.NotNil(t, err)
 	r, _ := regexp.Compile("Internal desc = failed to retrieve user from Okta")
