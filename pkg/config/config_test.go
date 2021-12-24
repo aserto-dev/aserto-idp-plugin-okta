@@ -11,8 +11,8 @@ import (
 func TestValidateWithEmptyDomain(t *testing.T) {
 	assert := require.New(t)
 	config := OktaConfig{
-		OktaDomain:   "",
-		OktaApiToken: "token",
+		Domain:   "",
+		ApiToken: "token",
 	}
 	err := config.Validate(plugin.OperationTypeRead)
 
@@ -23,8 +23,8 @@ func TestValidateWithEmptyDomain(t *testing.T) {
 func TestValidateWithEmptyToken(t *testing.T) {
 	assert := require.New(t)
 	config := OktaConfig{
-		OktaDomain:   "domain",
-		OktaApiToken: "",
+		Domain:   "domain",
+		ApiToken: "",
 	}
 
 	err := config.Validate(plugin.OperationTypeRead)
@@ -36,8 +36,8 @@ func TestValidateWithEmptyToken(t *testing.T) {
 func TestValidateWithInvalidCredentials(t *testing.T) {
 	assert := require.New(t)
 	config := OktaConfig{
-		OktaDomain:   "domain",
-		OktaApiToken: "token",
+		Domain:   "domain",
+		ApiToken: "token",
 	}
 
 	err := config.Validate(plugin.OperationTypeRead)
@@ -50,8 +50,8 @@ func TestValidateWithInvalidCredentials(t *testing.T) {
 func TestDecription(t *testing.T) {
 	assert := require.New(t)
 	config := OktaConfig{
-		OktaDomain:   "test",
-		OktaApiToken: "test",
+		Domain:   "test",
+		ApiToken: "test",
 	}
 
 	description := config.Description()
