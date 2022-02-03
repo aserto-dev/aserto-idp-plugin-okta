@@ -3,9 +3,9 @@ module github.com/aserto-dev/aserto-idp-plugin-okta
 go 1.17
 
 require (
-	github.com/aserto-dev/go-grpc v0.7.0
-	github.com/aserto-dev/idp-plugin-sdk v0.7.0
-	github.com/aserto-dev/mage-loot v0.7.0
+	github.com/aserto-dev/go-grpc v0.8.0
+	github.com/aserto-dev/idp-plugin-sdk v0.8.0
+	github.com/aserto-dev/mage-loot v0.8.0
 	github.com/aserto-dev/sver v1.3.9
 	github.com/dongri/phonenumber v0.0.0-20210805005246-531b48ff7473
 	github.com/golang/mock v1.6.0
@@ -23,7 +23,7 @@ require (
 require (
 	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
-	github.com/aserto-dev/clui v0.7.0 // indirect
+	github.com/aserto-dev/clui v0.8.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/docker/cli v20.10.11+incompatible // indirect
