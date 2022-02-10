@@ -68,16 +68,17 @@ func TestTransformWithIncorrectPhoneNumberUser(t *testing.T) {
 	assert.Nil((*apiUser).Identities["0772233223"], "should not add the phone number to identities")
 }
 
-func TestTransformWithDeactivatedUser(t *testing.T) {
+func TestTransformWithDeprovisionedUser(t *testing.T) {
 	assert := require.New(t)
-	oktaUser := CreateTestOktaUser("1", "DEACTIVATED", "First", "Last", "testemail@test.com", "+40772233223")
+	oktaUser := CreateTestOktaUser("1", "DEPROVISIONED", "First", "Last", "testemail@test.com", "+40772233223")
 
 	apiUser := Transform(oktaUser)
 
 	assert.Equal("1", (*apiUser).Id, "should correctly detect the id")
-	assert.Equal("deactivated", (*apiUser).Attributes.Properties.Fields["status"].GetStringValue(), "should add status to attributes")
+	assert.Equal("deprovisioned", (*apiUser).Attributes.Properties.Fields["status"].GetStringValue(), "should add status to attributes")
 	assert.True((*apiUser).Identities["1"].Verified, "should always add user id as verified")
 	assert.False((*apiUser).Identities["testemail@test.com"].Verified, "should add user email as unverified")
+	assert.True((*apiUser).Deleted, "user should be marked as deleted")
 }
 
 func TestTransformWithUserCustomAttributes(t *testing.T) {

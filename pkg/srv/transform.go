@@ -69,6 +69,7 @@ func Transform(in *okta.User) *api.User {
 	email := fmt.Sprint((*profileMap)["email"])
 	status := strings.ToLower(in.Status)
 	verified := false
+	deleted := false
 
 	switch status {
 	case
@@ -77,6 +78,8 @@ func Transform(in *okta.User) *api.User {
 		"locked out",
 		"password expired":
 		verified = true
+	case "deprovisioned":
+		deleted = true
 	}
 
 	user := api.User{
@@ -95,6 +98,7 @@ func Transform(in *okta.User) *api.User {
 			CreatedAt: timestamppb.New(*in.Created),
 			UpdatedAt: timestamppb.New(*in.LastUpdated),
 		},
+		Deleted: deleted,
 	}
 
 	user.Attributes.Properties.Fields["status"] = structpb.NewStringValue(status)
