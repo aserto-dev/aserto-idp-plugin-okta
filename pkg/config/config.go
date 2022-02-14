@@ -24,7 +24,7 @@ func GetVersion() (string, string, string) {
 
 type OktaConfig struct {
 	Domain   string `description:"Okta domain" kind:"attribute" mode:"normal" readonly:"false" name:"domain"`
-	ApiToken string `description:"Okta API Token" kind:"attribute" mode:"normal" readonly:"false" name:"api_token"`
+	ApiToken string `description:"Okta API Token" kind:"attribute" mode:"normal" readonly:"false" name:"api-token"`
 }
 
 func NewOktaConfig() *OktaConfig {
