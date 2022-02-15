@@ -38,6 +38,40 @@ func TestOpenForRead(t *testing.T) {
 	assert.Nil(err)
 }
 
+func TestReadFailToRetriveUserByID(t *testing.T) {
+	// Arrange
+	assert := require.New(t)
+	p := NewTestOktaPlugin(gomock.NewController(t), nil)
+	err := p.Open(&config.OktaConfig{UserId: "invalidID"}, plugin.OperationTypeRead)
+	assert.Nil(err)
+
+	p.client.(*oktaclient.MockOktaClient).EXPECT().GetUser(p.ctx, "invalidID").Return(
+		nil, nil, errors.New("BOOM!"))
+
+	users, err := p.Read()
+
+	assert.NotNil(err)
+	assert.Equal("BOOM!", err.Error(), "should return error")
+	assert.Nil(users)
+}
+
+func TestReadUserByID(t *testing.T) {
+	// Arrange
+	assert := require.New(t)
+	p := NewTestOktaPlugin(gomock.NewController(t), nil)
+	err := p.Open(&config.OktaConfig{UserId: "userID"}, plugin.OperationTypeRead)
+	oktaUser := CreateTestOktaUser("user1", "active", "stephen", "fry", "stephen@planetexpress.com", "123456")
+	assert.Nil(err)
+
+	p.client.(*oktaclient.MockOktaClient).EXPECT().GetUser(p.ctx, "userID").Return(oktaUser, nil, nil)
+
+	users, err := p.Read()
+
+	assert.Nil(err)
+	assert.NotNil(users)
+	assert.Equal(users[0].Id, oktaUser.Id)
+}
+
 func TestReadFailToRetriveUsers(t *testing.T) {
 	// Arrange
 	assert := require.New(t)
