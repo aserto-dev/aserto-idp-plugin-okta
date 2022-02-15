@@ -3,6 +3,7 @@ package srv
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 
 	"github.com/aserto-dev/aserto-idp-plugin-okta/pkg/config"
@@ -59,6 +60,20 @@ func (o *OktaPlugin) Read() ([]*api.User, error) {
 
 	var errs error
 	var users []*api.User
+
+	if o.config.UserId != "" {
+		user, _, err := o.client.GetUser(o.ctx, o.config.UserId)
+		o.finishedRead = true
+		if err != nil {
+			return nil, err
+		}
+		if user == nil {
+			return nil, fmt.Errorf("failed to get user by id %s", o.config.UserId)
+		}
+		apiUser := Transform(user)
+		users = append(users, apiUser)
+		return users, nil
+	}
 
 	if o.response == nil {
 		oktaUsers, resp, err := o.client.ListUsers(o.ctx, nil)
