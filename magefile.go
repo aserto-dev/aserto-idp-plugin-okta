@@ -77,7 +77,10 @@ func Test() error {
 }
 
 func Generate() error {
-	return common.Generate()
+	return common.GenerateWith([]string{
+		filepath.Dir(deps.GoBinPath("mockgen")),
+		filepath.Dir(deps.GoBinPath("wire")),
+	})
 }
 
 // All runs all targets in the appropriate order.
