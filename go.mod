@@ -2,10 +2,12 @@ module github.com/aserto-dev/aserto-idp-plugin-okta
 
 go 1.17
 
+//replace github.com/aserto-dev/mage-loot => ../mage-loot
+
 require (
 	github.com/aserto-dev/go-grpc v0.8.0
 	github.com/aserto-dev/idp-plugin-sdk v0.8.0
-	github.com/aserto-dev/mage-loot v0.8.0
+	github.com/aserto-dev/mage-loot v0.8.1
 	github.com/aserto-dev/sver v1.3.9
 	github.com/dongri/phonenumber v0.0.0-20210805005246-531b48ff7473
 	github.com/golang/mock v1.6.0
