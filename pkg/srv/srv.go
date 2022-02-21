@@ -26,7 +26,7 @@ type OktaPlugin struct {
 	finishedRead bool
 }
 
-func (o *OktaPlugin) GetConfig() plugin.PluginConfig {
+func (o *OktaPlugin) GetConfig() plugin.Config {
 	return &config.OktaConfig{}
 }
 
@@ -34,7 +34,7 @@ func (o *OktaPlugin) GetVersion() (string, string, string) {
 	return config.GetVersion()
 }
 
-func (o *OktaPlugin) Open(cfg plugin.PluginConfig, op plugin.OperationType) error {
+func (o *OktaPlugin) Open(cfg plugin.Config, op plugin.OperationType) error {
 	conf, ok := cfg.(*config.OktaConfig)
 
 	if !ok {
@@ -61,18 +61,11 @@ func (o *OktaPlugin) Read() ([]*api.User, error) {
 	var errs error
 	var users []*api.User
 
-	if o.config.UserID != "" {
-		user, _, err := o.client.GetUser(o.ctx, o.config.UserID)
-		o.finishedRead = true
-		if err != nil {
-			return nil, err
-		}
-		if user == nil {
-			return nil, fmt.Errorf("failed to get user by id %s", o.config.UserID)
-		}
-		apiUser := Transform(user)
-		users = append(users, apiUser)
-		return users, nil
+	if o.config.UserPID != "" {
+		return o.readByInfo(o.config.UserPID)
+	}
+	if o.config.UserEmail != "" {
+		return o.readByInfo(o.config.UserEmail)
 	}
 
 	if o.response == nil {
@@ -117,6 +110,22 @@ func (o *OktaPlugin) Read() ([]*api.User, error) {
 	}
 
 	return users, errs
+}
+
+func (o *OktaPlugin) readByInfo(info string) ([]*api.User, error) {
+	var users []*api.User
+
+	user, _, err := o.client.GetUser(o.ctx, info)
+	o.finishedRead = true
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, fmt.Errorf("failed to get user by %s", info)
+	}
+	apiUser := Transform(user)
+	users = append(users, apiUser)
+	return users, nil
 }
 
 func (o *OktaPlugin) Write(user *api.User) error {

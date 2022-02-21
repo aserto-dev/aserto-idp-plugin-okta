@@ -11,8 +11,8 @@ func main() {
 
 	oktaPlugin := srv.NewOktaPlugin()
 
-	options := &plugin.PluginOptions{
-		PluginHandler: oktaPlugin,
+	options := &plugin.Options{
+		Handler: oktaPlugin,
 	}
 
 	err := plugin.Serve(options)
