@@ -42,16 +42,16 @@ func TestReadFailToRetriveUserByID(t *testing.T) {
 	// Arrange
 	assert := require.New(t)
 	p := NewTestOktaPlugin(gomock.NewController(t), nil)
-	err := p.Open(&config.OktaConfig{UserId: "invalidID"}, plugin.OperationTypeRead)
+	err := p.Open(&config.OktaConfig{UserID: "invalidID"}, plugin.OperationTypeRead)
 	assert.Nil(err)
 
 	p.client.(*oktaclient.MockOktaClient).EXPECT().GetUser(p.ctx, "invalidID").Return(
-		nil, nil, errors.New("BOOM!"))
+		nil, nil, errors.New("boom"))
 
 	users, err := p.Read()
 
 	assert.NotNil(err)
-	assert.Equal("BOOM!", err.Error(), "should return error")
+	assert.Equal("boom", err.Error(), "should return error")
 	assert.Nil(users)
 }
 
@@ -59,7 +59,7 @@ func TestReadUserByID(t *testing.T) {
 	// Arrange
 	assert := require.New(t)
 	p := NewTestOktaPlugin(gomock.NewController(t), nil)
-	err := p.Open(&config.OktaConfig{UserId: "userID"}, plugin.OperationTypeRead)
+	err := p.Open(&config.OktaConfig{UserID: "userID"}, plugin.OperationTypeRead)
 	oktaUser := CreateTestOktaUser("user1", "active", "stephen", "fry", "stephen@planetexpress.com", "123456")
 	assert.Nil(err)
 
@@ -80,12 +80,12 @@ func TestReadFailToRetriveUsers(t *testing.T) {
 	assert.Nil(err)
 
 	p.client.(*oktaclient.MockOktaClient).EXPECT().ListUsers(p.ctx, gomock.Any()).Return(
-		nil, nil, errors.New("BOOM!"))
+		nil, nil, errors.New("boom"))
 
 	users, err := p.Read()
 
 	assert.NotNil(err)
-	assert.Equal("BOOM!", err.Error(), "should return error")
+	assert.Equal("boom", err.Error(), "should return error")
 	assert.Nil(users)
 }
 
@@ -115,7 +115,7 @@ func TestReadMultiplePagesAneNextPageFail(t *testing.T) {
 	// Arrange
 	assert := require.New(t)
 	p := NewTestOktaPlugin(gomock.NewController(t), func(c context.Context, r *okta.Response, users *[]*okta.User) (*okta.Response, error) {
-		return nil, errors.New("BOOM!")
+		return nil, errors.New("boom")
 	})
 	err := p.Open(&config.OktaConfig{}, plugin.OperationTypeRead)
 	assert.Nil(err)
@@ -134,7 +134,7 @@ func TestReadMultiplePagesAneNextPageFail(t *testing.T) {
 	assert.Len(users1, 2)
 	assert.Nil(users2)
 	assert.NotNil(err2)
-	assert.Equal("1 error occurred:\n\t* BOOM!\n\n", err2.Error(), "should return error")
+	assert.Equal("1 error occurred:\n\t* boom\n\n", err2.Error(), "should return error")
 }
 
 func TestReadMultiplePages(t *testing.T) {
@@ -174,12 +174,12 @@ func TestDeleteWithInvalidId(t *testing.T) {
 	err := p.Open(&config.OktaConfig{}, plugin.OperationTypeRead)
 	assert.Nil(err)
 
-	p.client.(*oktaclient.MockOktaClient).EXPECT().DeactivateUser(p.ctx, "1", nil).Return(nil, errors.New("ERROR!"))
+	p.client.(*oktaclient.MockOktaClient).EXPECT().DeactivateUser(p.ctx, "1", nil).Return(nil, errors.New("error"))
 
 	err = p.Delete("1")
 
 	assert.NotNil(err)
-	assert.Equal("ERROR!", err.Error())
+	assert.Equal("error", err.Error())
 }
 
 func TestDeleteWhenDeleteFails(t *testing.T) {
@@ -189,12 +189,12 @@ func TestDeleteWhenDeleteFails(t *testing.T) {
 	assert.Nil(err)
 
 	p.client.(*oktaclient.MockOktaClient).EXPECT().DeactivateUser(p.ctx, "1", nil).Return(nil, nil)
-	p.client.(*oktaclient.MockOktaClient).EXPECT().DeactivateOrDeleteUser(p.ctx, "1", nil).Return(nil, errors.New("ERROR!"))
+	p.client.(*oktaclient.MockOktaClient).EXPECT().DeactivateOrDeleteUser(p.ctx, "1", nil).Return(nil, errors.New("error"))
 
 	err = p.Delete("1")
 
 	assert.NotNil(err)
-	assert.Equal("ERROR!", err.Error())
+	assert.Equal("error", err.Error())
 }
 
 func TestDeleteSuccess(t *testing.T) {
@@ -216,7 +216,7 @@ func TestWriteWithNewUserFail(t *testing.T) {
 	p := NewTestOktaPlugin(gomock.NewController(t), nil)
 	err := p.Open(&config.OktaConfig{}, plugin.OperationTypeRead)
 	assert.Nil(err)
-	user := CreateTestApiUser("1", "Name", "mail", "active", "40772233223")
+	user := CreateTestAPIUser("1", "Name", "mail", "active", "40772233223")
 
 	p.client.(*oktaclient.MockOktaClient).EXPECT().GetUser(p.ctx, user.Id).Return(nil, nil, errors.New("Error1"))
 	p.client.(*oktaclient.MockOktaClient).EXPECT().CreateUser(p.ctx, gomock.Any(), gomock.Any()).Return(nil, nil, errors.New("Error2"))
@@ -232,7 +232,7 @@ func TestWriteWithNewUserSuccess(t *testing.T) {
 	p := NewTestOktaPlugin(gomock.NewController(t), nil)
 	err := p.Open(&config.OktaConfig{}, plugin.OperationTypeRead)
 	assert.Nil(err)
-	user := CreateTestApiUser("1", "Name", "mail", "active", "40772233223")
+	user := CreateTestAPIUser("1", "Name", "mail", "active", "40772233223")
 
 	p.client.(*oktaclient.MockOktaClient).EXPECT().GetUser(p.ctx, user.Id).Return(nil, nil, errors.New("Error1"))
 	p.client.(*oktaclient.MockOktaClient).EXPECT().CreateUser(p.ctx, gomock.Any(), gomock.Any()).Return(nil, nil, nil)
@@ -247,7 +247,7 @@ func TestWriteWithExistingUserFail(t *testing.T) {
 	p := NewTestOktaPlugin(gomock.NewController(t), nil)
 	err := p.Open(&config.OktaConfig{}, plugin.OperationTypeRead)
 	assert.Nil(err)
-	user := CreateTestApiUser("1", "Name", "mail", "active", "40772233223")
+	user := CreateTestAPIUser("1", "Name", "mail", "active", "40772233223")
 
 	p.client.(*oktaclient.MockOktaClient).EXPECT().GetUser(p.ctx, user.Id).Return(nil, nil, nil)
 	p.client.(*oktaclient.MockOktaClient).EXPECT().UpdateUser(p.ctx, gomock.Any(), gomock.Any(), gomock.Any()).Return(
@@ -264,7 +264,7 @@ func TestWriteWithExistingUserSuccess(t *testing.T) {
 	p := NewTestOktaPlugin(gomock.NewController(t), nil)
 	err := p.Open(&config.OktaConfig{}, plugin.OperationTypeRead)
 	assert.Nil(err)
-	user := CreateTestApiUser("1", "Name", "mail", "active", "40772233223")
+	user := CreateTestAPIUser("1", "Name", "mail", "active", "40772233223")
 
 	p.client.(*oktaclient.MockOktaClient).EXPECT().GetUser(p.ctx, user.Id).Return(nil, nil, nil)
 	p.client.(*oktaclient.MockOktaClient).EXPECT().UpdateUser(p.ctx, gomock.Any(), gomock.Any(), gomock.Any()).Return(

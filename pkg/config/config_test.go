@@ -12,7 +12,7 @@ func TestValidateWithEmptyDomain(t *testing.T) {
 	assert := require.New(t)
 	config := OktaConfig{
 		Domain:   "",
-		ApiToken: "token",
+		APIToken: "token",
 	}
 	err := config.Validate(plugin.OperationTypeRead)
 
@@ -24,7 +24,7 @@ func TestValidateWithEmptyToken(t *testing.T) {
 	assert := require.New(t)
 	config := OktaConfig{
 		Domain:   "domain",
-		ApiToken: "",
+		APIToken: "",
 	}
 
 	err := config.Validate(plugin.OperationTypeRead)
@@ -37,21 +37,21 @@ func TestValidateWithInvalidCredentials(t *testing.T) {
 	assert := require.New(t)
 	config := OktaConfig{
 		Domain:   "domain",
-		ApiToken: "token",
+		APIToken: "token",
 	}
 
 	err := config.Validate(plugin.OperationTypeRead)
 
 	assert.NotNil(t, err)
-	r, _ := regexp.Compile("Internal desc = failed to retrieve user from Okta")
+	r := regexp.MustCompile("Internal desc = failed to retrieve user from Okta")
 	assert.Regexp(r, err.Error())
 }
 
-func TestDecription(t *testing.T) {
+func TestDescription(t *testing.T) {
 	assert := require.New(t)
 	config := OktaConfig{
 		Domain:   "test",
-		ApiToken: "test",
+		APIToken: "test",
 	}
 
 	description := config.Description()

@@ -10,7 +10,7 @@ import (
 
 func TestConstructOktaProfile(t *testing.T) {
 	assert := require.New(t)
-	apiUser := CreateTestApiUser("1", "First Last", "testemail@test.com", "active", "40772233223")
+	apiUser := CreateTestAPIUser("1", "First Last", "testemail@test.com", "active", "40772233223")
 
 	oktaProfile := ConstructOktaProfile(apiUser)
 
@@ -24,7 +24,7 @@ func TestConstructOktaProfile(t *testing.T) {
 
 func TestConstructOktaProfileWithUserHavingOnlyFirstName(t *testing.T) {
 	assert := require.New(t)
-	apiUserWOLastName := CreateTestApiUser("1", "First", "testemail@test.com", "active", "40772233223")
+	apiUserWOLastName := CreateTestAPIUser("1", "First", "testemail@test.com", "active", "40772233223")
 
 	oktaProfileWOLastName := ConstructOktaProfile(apiUserWOLastName)
 
@@ -34,7 +34,7 @@ func TestConstructOktaProfileWithUserHavingOnlyFirstName(t *testing.T) {
 
 func TestTransformToOktaUserReq(t *testing.T) {
 	assert := require.New(t)
-	apiUser := CreateTestApiUser("1", "First Last", "testemail@test.com", "active", "40772233223")
+	apiUser := CreateTestAPIUser("1", "First Last", "testemail@test.com", "active", "40772233223")
 
 	oktaUserReq := TransformToOktaUserReq(apiUser)
 
@@ -49,13 +49,13 @@ func TestTransformWithActiveCompleteUser(t *testing.T) {
 
 	apiUser := Transform(oktaUser)
 
-	assert.Equal("1", (*apiUser).Id, "should correctly detect the id")
-	assert.Equal("First Last", (*apiUser).DisplayName, "should correctly construct the displayName")
-	assert.Equal("active", (*apiUser).Attributes.Properties.Fields["status"].GetStringValue(), "should add status to attributes")
-	assert.Equal("test", (*apiUser).Attributes.Properties.Fields["additional_info"].GetStringValue(), "should add additional profile info to attributes")
-	assert.Equal(3, len((*apiUser).Identities), "3 identities should be populated")
-	assert.True((*apiUser).Identities["1"].Verified, "should add user id as a verified identity")
-	assert.True((*apiUser).Identities["40772233223"].Verified, "should add the phone number to identities")
+	assert.Equal("1", apiUser.Id, "should correctly detect the id")
+	assert.Equal("First Last", apiUser.DisplayName, "should correctly construct the displayName")
+	assert.Equal("active", apiUser.Attributes.Properties.Fields["status"].GetStringValue(), "should add status to attributes")
+	assert.Equal("test", apiUser.Attributes.Properties.Fields["additional_info"].GetStringValue(), "should add additional profile info to attributes")
+	assert.Equal(3, len(apiUser.Identities), "3 identities should be populated")
+	assert.True(apiUser.Identities["1"].Verified, "should add user id as a verified identity")
+	assert.True(apiUser.Identities["40772233223"].Verified, "should add the phone number to identities")
 }
 
 func TestTransformWithIncorrectPhoneNumberUser(t *testing.T) {
@@ -64,8 +64,8 @@ func TestTransformWithIncorrectPhoneNumberUser(t *testing.T) {
 
 	apiUser := Transform(oktaUser)
 
-	assert.Equal(2, len((*apiUser).Identities), "2 identities should be populated")
-	assert.Nil((*apiUser).Identities["0772233223"], "should not add the phone number to identities")
+	assert.Equal(2, len(apiUser.Identities), "2 identities should be populated")
+	assert.Nil(apiUser.Identities["0772233223"], "should not add the phone number to identities")
 }
 
 func TestTransformWithDeprovisionedUser(t *testing.T) {
@@ -74,11 +74,11 @@ func TestTransformWithDeprovisionedUser(t *testing.T) {
 
 	apiUser := Transform(oktaUser)
 
-	assert.Equal("1", (*apiUser).Id, "should correctly detect the id")
-	assert.Equal("deprovisioned", (*apiUser).Attributes.Properties.Fields["status"].GetStringValue(), "should add status to attributes")
-	assert.True((*apiUser).Identities["1"].Verified, "should always add user id as verified")
-	assert.False((*apiUser).Identities["testemail@test.com"].Verified, "should add user email as unverified")
-	assert.True((*apiUser).Deleted, "user should be marked as deleted")
+	assert.Equal("1", apiUser.Id, "should correctly detect the id")
+	assert.Equal("deprovisioned", apiUser.Attributes.Properties.Fields["status"].GetStringValue(), "should add status to attributes")
+	assert.True(apiUser.Identities["1"].Verified, "should always add user id as verified")
+	assert.False(apiUser.Identities["testemail@test.com"].Verified, "should add user email as unverified")
+	assert.True(apiUser.Deleted, "user should be marked as deleted")
 }
 
 func TestTransformWithUserCustomAttributes(t *testing.T) {
@@ -90,7 +90,7 @@ func TestTransformWithUserCustomAttributes(t *testing.T) {
 
 	apiUser := Transform(oktaUser)
 
-	rolesTranslated := (*apiUser).Attributes.Properties.Fields["roles"].GetListValue().Values
+	rolesTranslated := apiUser.Attributes.Properties.Fields["roles"].GetListValue().Values
 	assert.Equal(roles[0], rolesTranslated[0].GetStringValue(), "should add custom attributes with proper type")
 }
 
@@ -102,6 +102,6 @@ func TestTransformWithInvalidTypeUserCustomAttributes(t *testing.T) {
 
 	apiUser := Transform(oktaUser)
 
-	rolesTranslated := (*apiUser).Attributes.Properties.Fields["roles"]
+	rolesTranslated := apiUser.Attributes.Properties.Fields["roles"]
 	assert.Nil(rolesTranslated)
 }

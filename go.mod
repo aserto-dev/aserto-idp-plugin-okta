@@ -5,20 +5,20 @@ go 1.17
 //replace github.com/aserto-dev/mage-loot => ../mage-loot
 
 require (
-	github.com/aserto-dev/go-grpc v0.8.0
+	github.com/aserto-dev/go-grpc v0.8.2
 	github.com/aserto-dev/idp-plugin-sdk v0.8.0
 	github.com/aserto-dev/mage-loot v0.8.1
 	github.com/aserto-dev/sver v1.3.9
-	github.com/dongri/phonenumber v0.0.0-20210805005246-531b48ff7473
+	github.com/dongri/phonenumber v0.0.0-20220127125919-1e58a2b4cf97
 	github.com/golang/mock v1.6.0
 	github.com/google/wire v0.5.0
-	github.com/hashicorp/go-multierror v1.0.0
+	github.com/hashicorp/go-multierror v1.1.1
 	github.com/magefile/mage v1.12.1
-	github.com/okta/okta-sdk-golang/v2 v2.9.1
-	github.com/rs/zerolog v1.26.0
+	github.com/okta/okta-sdk-golang/v2 v2.10.1
+	github.com/rs/zerolog v1.26.1
 	github.com/stretchr/testify v1.7.0
-	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
-	google.golang.org/grpc v1.43.0
+	golang.org/x/sys v0.0.0-20220209214540-3681064d5158 // indirect
+	google.golang.org/grpc v1.44.0
 	google.golang.org/protobuf v1.27.1
 )
 
@@ -61,7 +61,7 @@ require (
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/ulikunitz/xz v0.5.10 // indirect
-	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97 // indirect
+	golang.org/x/crypto v0.0.0-20211215165025-cf75a172585e // indirect
 	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect

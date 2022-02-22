@@ -35,7 +35,7 @@ func ConstructOktaProfile(in *api.User) *okta.UserProfile {
 	profile["login"] = in.Email
 
 	for key, value := range in.Attributes.Properties.Fields {
-		if key != "status" && key != "phone" {
+		if key != "status" && key != "phone" { //nolint : goconst // nop
 			profile[key] = value
 		}
 	}
@@ -118,7 +118,7 @@ func Transform(in *okta.User) *api.User {
 			if value != nil {
 				structValue, err := structpb.NewValue(value)
 				if err != nil {
-					msg := fmt.Sprintf("%s okta custom attribute wasn't successfuly converted and won't be added to the api user's attributes. Cause: %s", key, err.Error())
+					msg := fmt.Sprintf("%s okta custom attribute wasn't successfully converted and won't be added to the api user's attributes. Cause: %s", key, err.Error())
 					log.Warn().Msg(msg)
 					continue
 				}

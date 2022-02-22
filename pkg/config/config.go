@@ -24,8 +24,8 @@ func GetVersion() (string, string, string) {
 
 type OktaConfig struct {
 	Domain   string `description:"Okta domain" kind:"attribute" mode:"normal" readonly:"false" name:"domain"`
-	ApiToken string `description:"Okta API Token" kind:"attribute" mode:"normal" readonly:"false" name:"api-token"`
-	UserId   string `description:"Okta User ID to read" kind:"attribute" mode:"normal" readonly:"false" name:"user-id"`
+	APIToken string `description:"Okta API Token" kind:"attribute" mode:"normal" readonly:"false" name:"api-token"`
+	UserID   string `description:"Okta User ID to read" kind:"attribute" mode:"normal" readonly:"false" name:"user-id"`
 }
 
 func NewOktaConfig() *OktaConfig {
@@ -38,13 +38,13 @@ func (c *OktaConfig) Validate(opType plugin.OperationType) error {
 		return status.Error(codes.InvalidArgument, "no okta domain was provided")
 	}
 
-	if c.ApiToken == "" {
+	if c.APIToken == "" {
 		return status.Error(codes.InvalidArgument, "no okta api token was provided")
 	}
 
 	ctx, client, err := okta.NewClient(context.Background(),
 		okta.WithOrgUrl(fmt.Sprintf("https://%s", c.Domain)),
-		okta.WithToken(c.ApiToken),
+		okta.WithToken(c.APIToken),
 	)
 
 	if err != nil {

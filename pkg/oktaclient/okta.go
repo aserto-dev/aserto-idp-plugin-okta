@@ -16,17 +16,17 @@ import (
 type OktaClient interface {
 	CreateUser(ctx context.Context, body okta.CreateUserRequest, qp *query.Params) (*okta.User, *okta.Response, error)
 	ListUsers(ctx context.Context, qp *query.Params) ([]*okta.User, *okta.Response, error)
-	GetUser(ctx context.Context, userId string) (*okta.User, *okta.Response, error)
-	UpdateUser(ctx context.Context, userId string, body okta.User, qp *query.Params) (*okta.User, *okta.Response, error)
-	DeactivateOrDeleteUser(ctx context.Context, userId string, qp *query.Params) (*okta.Response, error)
-	DeactivateUser(ctx context.Context, userId string, qp *query.Params) (*okta.Response, error)
+	GetUser(ctx context.Context, userID string) (*okta.User, *okta.Response, error)
+	UpdateUser(ctx context.Context, userID string, body okta.User, qp *query.Params) (*okta.User, *okta.Response, error)
+	DeactivateOrDeleteUser(ctx context.Context, userID string, qp *query.Params) (*okta.Response, error)
+	DeactivateUser(ctx context.Context, userID string, qp *query.Params) (*okta.Response, error)
 }
 
 func NewOktaClient(ctx context.Context, cfg *config.OktaConfig) (OktaClient, error) {
 	_, client, err := okta.NewClient(
 		ctx,
 		okta.WithOrgUrl(fmt.Sprintf("https://%s", cfg.Domain)),
-		okta.WithToken(cfg.ApiToken),
+		okta.WithToken(cfg.APIToken),
 	)
 
 	if err != nil {
