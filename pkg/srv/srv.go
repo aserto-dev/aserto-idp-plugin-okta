@@ -26,28 +26,28 @@ type OktaPlugin struct {
 	finishedRead bool
 }
 
-func (s *OktaPlugin) GetConfig() plugin.PluginConfig {
+func (o *OktaPlugin) GetConfig() plugin.PluginConfig {
 	return &config.OktaConfig{}
 }
 
-func (s *OktaPlugin) GetVersion() (string, string, string) {
+func (o *OktaPlugin) GetVersion() (string, string, string) {
 	return config.GetVersion()
 }
 
 func (o *OktaPlugin) Open(cfg plugin.PluginConfig, op plugin.OperationType) error {
-	config, ok := cfg.(*config.OktaConfig)
+	conf, ok := cfg.(*config.OktaConfig)
 
 	if !ok {
 		return errors.New("invalid config")
 	}
 
-	err := o.oktaClient(config)
+	err := o.oktaClient(conf)
 
 	if err != nil {
 		return err
 	}
 
-	o.config = config
+	o.config = conf
 
 	o.finishedRead = false
 	return nil
@@ -61,14 +61,14 @@ func (o *OktaPlugin) Read() ([]*api.User, error) {
 	var errs error
 	var users []*api.User
 
-	if o.config.UserId != "" {
-		user, _, err := o.client.GetUser(o.ctx, o.config.UserId)
+	if o.config.UserID != "" {
+		user, _, err := o.client.GetUser(o.ctx, o.config.UserID)
 		o.finishedRead = true
 		if err != nil {
 			return nil, err
 		}
 		if user == nil {
-			return nil, fmt.Errorf("failed to get user by id %s", o.config.UserId)
+			return nil, fmt.Errorf("failed to get user by id %s", o.config.UserID)
 		}
 		apiUser := Transform(user)
 		users = append(users, apiUser)

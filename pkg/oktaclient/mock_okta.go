@@ -53,39 +53,39 @@ func (mr *MockOktaClientMockRecorder) CreateUser(ctx, body, qp interface{}) *gom
 }
 
 // DeactivateOrDeleteUser mocks base method.
-func (m *MockOktaClient) DeactivateOrDeleteUser(ctx context.Context, userId string, qp *query.Params) (*okta.Response, error) {
+func (m *MockOktaClient) DeactivateOrDeleteUser(ctx context.Context, userID string, qp *query.Params) (*okta.Response, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeactivateOrDeleteUser", ctx, userId, qp)
+	ret := m.ctrl.Call(m, "DeactivateOrDeleteUser", ctx, userID, qp)
 	ret0, _ := ret[0].(*okta.Response)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // DeactivateOrDeleteUser indicates an expected call of DeactivateOrDeleteUser.
-func (mr *MockOktaClientMockRecorder) DeactivateOrDeleteUser(ctx, userId, qp interface{}) *gomock.Call {
+func (mr *MockOktaClientMockRecorder) DeactivateOrDeleteUser(ctx, userID, qp interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeactivateOrDeleteUser", reflect.TypeOf((*MockOktaClient)(nil).DeactivateOrDeleteUser), ctx, userId, qp)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeactivateOrDeleteUser", reflect.TypeOf((*MockOktaClient)(nil).DeactivateOrDeleteUser), ctx, userID, qp)
 }
 
 // DeactivateUser mocks base method.
-func (m *MockOktaClient) DeactivateUser(ctx context.Context, userId string, qp *query.Params) (*okta.Response, error) {
+func (m *MockOktaClient) DeactivateUser(ctx context.Context, userID string, qp *query.Params) (*okta.Response, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeactivateUser", ctx, userId, qp)
+	ret := m.ctrl.Call(m, "DeactivateUser", ctx, userID, qp)
 	ret0, _ := ret[0].(*okta.Response)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // DeactivateUser indicates an expected call of DeactivateUser.
-func (mr *MockOktaClientMockRecorder) DeactivateUser(ctx, userId, qp interface{}) *gomock.Call {
+func (mr *MockOktaClientMockRecorder) DeactivateUser(ctx, userID, qp interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeactivateUser", reflect.TypeOf((*MockOktaClient)(nil).DeactivateUser), ctx, userId, qp)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeactivateUser", reflect.TypeOf((*MockOktaClient)(nil).DeactivateUser), ctx, userID, qp)
 }
 
 // GetUser mocks base method.
-func (m *MockOktaClient) GetUser(ctx context.Context, userId string) (*okta.User, *okta.Response, error) {
+func (m *MockOktaClient) GetUser(ctx context.Context, userID string) (*okta.User, *okta.Response, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUser", ctx, userId)
+	ret := m.ctrl.Call(m, "GetUser", ctx, userID)
 	ret0, _ := ret[0].(*okta.User)
 	ret1, _ := ret[1].(*okta.Response)
 	ret2, _ := ret[2].(error)
@@ -93,9 +93,9 @@ func (m *MockOktaClient) GetUser(ctx context.Context, userId string) (*okta.User
 }
 
 // GetUser indicates an expected call of GetUser.
-func (mr *MockOktaClientMockRecorder) GetUser(ctx, userId interface{}) *gomock.Call {
+func (mr *MockOktaClientMockRecorder) GetUser(ctx, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockOktaClient)(nil).GetUser), ctx, userId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockOktaClient)(nil).GetUser), ctx, userID)
 }
 
 // ListUsers mocks base method.
@@ -115,9 +115,9 @@ func (mr *MockOktaClientMockRecorder) ListUsers(ctx, qp interface{}) *gomock.Cal
 }
 
 // UpdateUser mocks base method.
-func (m *MockOktaClient) UpdateUser(ctx context.Context, userId string, body okta.User, qp *query.Params) (*okta.User, *okta.Response, error) {
+func (m *MockOktaClient) UpdateUser(ctx context.Context, userID string, body okta.User, qp *query.Params) (*okta.User, *okta.Response, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateUser", ctx, userId, body, qp)
+	ret := m.ctrl.Call(m, "UpdateUser", ctx, userID, body, qp)
 	ret0, _ := ret[0].(*okta.User)
 	ret1, _ := ret[1].(*okta.Response)
 	ret2, _ := ret[2].(error)
@@ -125,7 +125,7 @@ func (m *MockOktaClient) UpdateUser(ctx context.Context, userId string, body okt
 }
 
 // UpdateUser indicates an expected call of UpdateUser.
-func (mr *MockOktaClientMockRecorder) UpdateUser(ctx, userId, body, qp interface{}) *gomock.Call {
+func (mr *MockOktaClientMockRecorder) UpdateUser(ctx, userID, body, qp interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUser", reflect.TypeOf((*MockOktaClient)(nil).UpdateUser), ctx, userId, body, qp)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUser", reflect.TypeOf((*MockOktaClient)(nil).UpdateUser), ctx, userID, body, qp)
 }

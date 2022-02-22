@@ -9,7 +9,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func CreateTestApiUser(id, displayName, email, status, mobilePhone string) *api.User {
+func CreateTestAPIUser(id, displayName, email, status, mobilePhone string) *api.User {
 	user := api.User{
 		Id:          id,
 		DisplayName: displayName,
