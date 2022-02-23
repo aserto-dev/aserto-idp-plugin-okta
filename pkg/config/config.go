@@ -23,9 +23,10 @@ func GetVersion() (string, string, string) {
 }
 
 type OktaConfig struct {
-	Domain   string `description:"Okta domain" kind:"attribute" mode:"normal" readonly:"false" name:"domain"`
-	APIToken string `description:"Okta API Token" kind:"attribute" mode:"normal" readonly:"false" name:"api-token"`
-	UserID   string `description:"Okta User ID to read" kind:"attribute" mode:"normal" readonly:"false" name:"user-id"`
+	Domain    string `description:"Okta domain" kind:"attribute" mode:"normal" readonly:"false" name:"domain"`
+	APIToken  string `description:"Okta API Token" kind:"attribute" mode:"normal" readonly:"false" name:"api-token"`
+	UserPID   string `description:"Okta User PID of the user you want to read" mode:"normal" readonly:"false" name:"user-pid"`
+	UserEmail string `description:"Okta User email of the user you want to read" mode:"normal" readonly:"false" name:"user-email"`
 }
 
 func NewOktaConfig() *OktaConfig {
@@ -40,6 +41,10 @@ func (c *OktaConfig) Validate(opType plugin.OperationType) error {
 
 	if c.APIToken == "" {
 		return status.Error(codes.InvalidArgument, "no okta api token was provided")
+	}
+
+	if c.UserPID != "" && c.UserEmail != "" {
+		return status.Error(codes.InvalidArgument, "an user PID and an user email were provided; please specify only one")
 	}
 
 	ctx, client, err := okta.NewClient(context.Background(),

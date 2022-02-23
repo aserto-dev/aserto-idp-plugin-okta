@@ -1,7 +1,6 @@
 package config
 
 import (
-	"regexp"
 	"testing"
 
 	"github.com/aserto-dev/idp-plugin-sdk/plugin"
@@ -43,11 +42,25 @@ func TestValidateWithInvalidCredentials(t *testing.T) {
 	err := config.Validate(plugin.OperationTypeRead)
 
 	assert.NotNil(t, err)
-	r := regexp.MustCompile("Internal desc = failed to retrieve user from Okta")
-	assert.Regexp(r, err.Error())
+	assert.Contains(err.Error(), "Internal desc = failed to retrieve user from Okta")
 }
 
-func TestDescription(t *testing.T) {
+func TestValidateWithUserPIDAndEmail(t *testing.T) {
+	assert := require.New(t)
+	config := OktaConfig{
+		Domain:    "domain",
+		APIToken:  "token",
+		UserPID:   "someID",
+		UserEmail: "test@email.com",
+	}
+
+	err := config.Validate(plugin.OperationTypeWrite)
+
+	assert.NotNil(err)
+	assert.Contains(err.Error(), "rpc error: code = InvalidArgument desc = an user PID and an user email were provided; please specify only one")
+}
+
+func TestDecription(t *testing.T) {
 	assert := require.New(t)
 	config := OktaConfig{
 		Domain:   "test",
