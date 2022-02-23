@@ -1,16 +1,17 @@
-package srv
+package transform
 
 import (
 	"reflect"
 	"testing"
 
+	"github.com/aserto-dev/aserto-idp-plugin-okta/pkg/testutils"
 	"github.com/okta/okta-sdk-golang/v2/okta"
 	"github.com/stretchr/testify/require"
 )
 
 func TestConstructOktaProfile(t *testing.T) {
 	assert := require.New(t)
-	apiUser := CreateTestAPIUser("1", "First Last", "testemail@test.com", "active", "40772233223")
+	apiUser := testutils.CreateTestAPIUser("1", "First Last", "testemail@test.com", "active", "40772233223")
 
 	oktaProfile := ConstructOktaProfile(apiUser)
 
@@ -24,7 +25,7 @@ func TestConstructOktaProfile(t *testing.T) {
 
 func TestConstructOktaProfileWithUserHavingOnlyFirstName(t *testing.T) {
 	assert := require.New(t)
-	apiUserWOLastName := CreateTestAPIUser("1", "First", "testemail@test.com", "active", "40772233223")
+	apiUserWOLastName := testutils.CreateTestAPIUser("1", "First", "testemail@test.com", "active", "40772233223")
 
 	oktaProfileWOLastName := ConstructOktaProfile(apiUserWOLastName)
 
@@ -32,22 +33,22 @@ func TestConstructOktaProfileWithUserHavingOnlyFirstName(t *testing.T) {
 	assert.Equal(" ", (*oktaProfileWOLastName)["lastName"], "should detect the last name and be a white space")
 }
 
-func TestTransformToOktaUserReq(t *testing.T) {
+func TestToOktaUserReq(t *testing.T) {
 	assert := require.New(t)
-	apiUser := CreateTestAPIUser("1", "First Last", "testemail@test.com", "active", "40772233223")
+	apiUser := testutils.CreateTestAPIUser("1", "First Last", "testemail@test.com", "active", "40772233223")
 
-	oktaUserReq := TransformToOktaUserReq(apiUser)
+	oktaUserReq := ToOktaUserReq(apiUser)
 
 	assert.True(reflect.TypeOf(*oktaUserReq) == reflect.TypeOf(okta.CreateUserRequest{}), "the returned object should be *okta.CreateUserRequest")
 	assert.Equal("testemail@test.com", (*oktaUserReq.Profile)["email"], "should correctly populate the user profile")
 }
 
-func TestTransformWithActiveCompleteUser(t *testing.T) {
+func TestFromOktaWithActiveCompleteUser(t *testing.T) {
 	assert := require.New(t)
-	oktaUser := CreateTestOktaUser("1", "ACTIVE", "First", "Last", "testemail@test.com", "+40772233223")
+	oktaUser := testutils.CreateTestOktaUser("1", "ACTIVE", "First", "Last", "testemail@test.com", "+40772233223")
 	(*oktaUser.Profile)["additional_info"] = "test"
 
-	apiUser := Transform(oktaUser)
+	apiUser := FromOkta(oktaUser)
 
 	assert.Equal("1", apiUser.Id, "should correctly detect the id")
 	assert.Equal("First Last", apiUser.DisplayName, "should correctly construct the displayName")
@@ -58,21 +59,21 @@ func TestTransformWithActiveCompleteUser(t *testing.T) {
 	assert.True(apiUser.Identities["40772233223"].Verified, "should add the phone number to identities")
 }
 
-func TestTransformWithIncorrectPhoneNumberUser(t *testing.T) {
+func TestFromOktaWithIncorrectPhoneNumberUser(t *testing.T) {
 	assert := require.New(t)
-	oktaUser := CreateTestOktaUser("1", "ACTIVE", "First", "Last", "testemail@test.com", "0772233223")
+	oktaUser := testutils.CreateTestOktaUser("1", "ACTIVE", "First", "Last", "testemail@test.com", "0772233223")
 
-	apiUser := Transform(oktaUser)
+	apiUser := FromOkta(oktaUser)
 
 	assert.Equal(2, len(apiUser.Identities), "2 identities should be populated")
 	assert.Nil(apiUser.Identities["0772233223"], "should not add the phone number to identities")
 }
 
-func TestTransformWithDeprovisionedUser(t *testing.T) {
+func TestFromOktaWithDeprovisionedUser(t *testing.T) {
 	assert := require.New(t)
-	oktaUser := CreateTestOktaUser("1", "DEPROVISIONED", "First", "Last", "testemail@test.com", "+40772233223")
+	oktaUser := testutils.CreateTestOktaUser("1", "DEPROVISIONED", "First", "Last", "testemail@test.com", "+40772233223")
 
-	apiUser := Transform(oktaUser)
+	apiUser := FromOkta(oktaUser)
 
 	assert.Equal("1", apiUser.Id, "should correctly detect the id")
 	assert.Equal("deprovisioned", apiUser.Attributes.Properties.Fields["status"].GetStringValue(), "should add status to attributes")
@@ -81,26 +82,26 @@ func TestTransformWithDeprovisionedUser(t *testing.T) {
 	assert.True(apiUser.Deleted, "user should be marked as deleted")
 }
 
-func TestTransformWithUserCustomAttributes(t *testing.T) {
+func TestFromOktaWithUserCustomAttributes(t *testing.T) {
 	assert := require.New(t)
 
 	var roles []interface{}
 	roles = append(roles, "admin", "plan")
-	oktaUser := CreateTestOktaUserWithCustomAttribute("roles", roles)
+	oktaUser := testutils.CreateTestOktaUserWithCustomAttribute("roles", roles)
 
-	apiUser := Transform(oktaUser)
+	apiUser := FromOkta(oktaUser)
 
 	rolesTranslated := apiUser.Attributes.Properties.Fields["roles"].GetListValue().Values
 	assert.Equal(roles[0], rolesTranslated[0].GetStringValue(), "should add custom attributes with proper type")
 }
 
-func TestTransformWithInvalidTypeUserCustomAttributes(t *testing.T) {
+func TestFromOktaWithInvalidTypeUserCustomAttributes(t *testing.T) {
 	assert := require.New(t)
 
 	roles := [2]string{"admin", "plan"}
-	oktaUser := CreateTestOktaUserWithCustomAttribute("roles", roles)
+	oktaUser := testutils.CreateTestOktaUserWithCustomAttribute("roles", roles)
 
-	apiUser := Transform(oktaUser)
+	apiUser := FromOkta(oktaUser)
 
 	rolesTranslated := apiUser.Attributes.Properties.Fields["roles"]
 	assert.Nil(rolesTranslated)

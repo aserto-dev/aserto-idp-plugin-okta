@@ -1,4 +1,4 @@
-package srv
+package testutils
 
 import (
 	"time"
@@ -32,7 +32,7 @@ func CreateTestAPIUser(id, displayName, email, status, mobilePhone string) *api.
 
 	user.Identities[mobilePhone] = &api.IdentitySource{
 		Kind:     api.IdentityKind_IDENTITY_KIND_PHONE,
-		Provider: provider,
+		Provider: "okta",
 		Verified: true,
 	}
 

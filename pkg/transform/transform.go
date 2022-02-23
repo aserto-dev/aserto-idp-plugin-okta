@@ -1,4 +1,4 @@
-package srv
+package transform
 
 import (
 	"fmt"
@@ -49,7 +49,7 @@ func ConstructOktaProfile(in *api.User) *okta.UserProfile {
 	return &profile
 }
 
-func TransformToOktaUserReq(in *api.User) *okta.CreateUserRequest {
+func ToOktaUserReq(in *api.User) *okta.CreateUserRequest {
 
 	uc := &okta.UserCredentials{}
 
@@ -62,7 +62,7 @@ func TransformToOktaUserReq(in *api.User) *okta.CreateUserRequest {
 }
 
 // Transform Okta user definition into Aserto Edge User object definition.
-func Transform(in *okta.User) *api.User {
+func FromOkta(in *okta.User) *api.User {
 
 	profileMap := in.Profile
 	displayName := fmt.Sprintf("%s %s", (*profileMap)["firstName"], (*profileMap)["lastName"])
