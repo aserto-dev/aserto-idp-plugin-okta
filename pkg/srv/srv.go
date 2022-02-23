@@ -8,6 +8,7 @@ import (
 
 	"github.com/aserto-dev/aserto-idp-plugin-okta/pkg/config"
 	"github.com/aserto-dev/aserto-idp-plugin-okta/pkg/oktaclient"
+	"github.com/aserto-dev/aserto-idp-plugin-okta/pkg/transform"
 	api "github.com/aserto-dev/go-grpc/aserto/api/v1"
 	"github.com/aserto-dev/idp-plugin-sdk/plugin"
 	multierror "github.com/hashicorp/go-multierror"
@@ -77,7 +78,7 @@ func (o *OktaPlugin) Read() ([]*api.User, error) {
 
 		for _, u := range oktaUsers {
 
-			user := Transform(u)
+			user := transform.FromOkta(u)
 			users = append(users, user)
 		}
 
@@ -99,7 +100,7 @@ func (o *OktaPlugin) Read() ([]*api.User, error) {
 	}
 
 	for _, u := range o.users {
-		user := Transform(u)
+		user := transform.FromOkta(u)
 		users = append(users, user)
 	}
 
@@ -123,7 +124,7 @@ func (o *OktaPlugin) readByInfo(info string) ([]*api.User, error) {
 	if user == nil {
 		return nil, fmt.Errorf("failed to get user by %s", info)
 	}
-	apiUser := Transform(user)
+	apiUser := transform.FromOkta(user)
 	users = append(users, apiUser)
 	return users, nil
 }
@@ -132,19 +133,19 @@ func (o *OktaPlugin) Write(user *api.User) error {
 	_, _, err := o.client.GetUser(o.ctx, user.Id)
 
 	if err != nil {
-		u := TransformToOktaUserReq(user)
+		u := transform.ToOktaUserReq(user)
 
-		_, _, err := o.client.CreateUser(o.ctx, *u, CreateQueryWithStatus(u.Profile))
+		_, _, err := o.client.CreateUser(o.ctx, *u, transform.CreateQueryWithStatus(u.Profile))
 
 		if err != nil {
 			return err
 		}
 	} else {
 		updatedUser := &okta.User{
-			Profile: ConstructOktaProfile(user),
+			Profile: transform.ConstructOktaProfile(user),
 		}
 
-		_, _, err := o.client.UpdateUser(o.ctx, user.Id, *updatedUser, CreateQueryWithStatus(updatedUser.Profile))
+		_, _, err := o.client.UpdateUser(o.ctx, user.Id, *updatedUser, transform.CreateQueryWithStatus(updatedUser.Profile))
 
 		if err != nil {
 			return err
