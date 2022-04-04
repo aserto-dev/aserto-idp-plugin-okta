@@ -75,8 +75,8 @@ func FromOkta(in *okta.User) *api.User {
 	case
 		"active",
 		"recovery",
-		"locked out",
-		"password expired":
+		"locked_out",
+		"password_expired":
 		verified = true
 	case "deprovisioned":
 		deleted = true
