@@ -1,7 +1,9 @@
 package srv
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -13,6 +15,7 @@ import (
 	"github.com/aserto-dev/idp-plugin-sdk/plugin"
 	multierror "github.com/hashicorp/go-multierror"
 	"github.com/okta/okta-sdk-golang/v2/okta"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 type OktaPager func(context.Context, *okta.Response, *[]*okta.User) (*okta.Response, error)
@@ -77,8 +80,26 @@ func (o *OktaPlugin) Read() ([]*api.User, error) {
 		}
 
 		for _, u := range oktaUsers {
-
 			user := transform.FromOkta(u)
+
+			if groups, _, err := o.client.ListUserGroups(o.ctx, u.Id); err == nil {
+				g := make([]interface{}, 0)
+				for _, group := range groups {
+					g = append(g, group.Profile.Name)
+				}
+
+				l, err := structpb.NewList(g)
+				if err == nil {
+					user.Attributes.Properties.Fields["groups"] = structpb.NewListValue(l)
+				}
+			}
+
+			if roles, _, err := o.client.ListAssignedRolesForUser(o.ctx, u.Id, nil); err == nil {
+				for _, role := range roles {
+					user.Attributes.Roles = append(user.Attributes.Roles, role.Type)
+				}
+			}
+
 			users = append(users, user)
 		}
 
@@ -193,4 +214,13 @@ func (o *OktaPlugin) oktaClient(cfg *config.OktaConfig) error {
 	o.client = client
 
 	return nil
+}
+
+func j2s(v interface{}) string {
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	enc.SetIndent("", "  ")
+	enc.SetEscapeHTML(true)
+	enc.Encode(v)
+	return buf.String()
 }

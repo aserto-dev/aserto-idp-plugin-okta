@@ -20,6 +20,8 @@ type OktaClient interface {
 	UpdateUser(ctx context.Context, userID string, body okta.User, qp *query.Params) (*okta.User, *okta.Response, error)
 	DeactivateOrDeleteUser(ctx context.Context, userID string, qp *query.Params) (*okta.Response, error)
 	DeactivateUser(ctx context.Context, userID string, qp *query.Params) (*okta.Response, error)
+	ListUserGroups(ctx context.Context, userId string) ([]*okta.Group, *okta.Response, error)
+	ListAssignedRolesForUser(ctx context.Context, userId string, qp *query.Params) ([]*okta.Role, *okta.Response, error)
 }
 
 func NewOktaClient(ctx context.Context, cfg *config.OktaConfig) (OktaClient, error) {
