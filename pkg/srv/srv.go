@@ -1,9 +1,7 @@
 package srv
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -214,13 +212,4 @@ func (o *OktaPlugin) oktaClient(cfg *config.OktaConfig) error {
 	o.client = client
 
 	return nil
-}
-
-func j2s(v interface{}) string {
-	var buf bytes.Buffer
-	enc := json.NewEncoder(&buf)
-	enc.SetIndent("", "  ")
-	enc.SetEscapeHTML(true)
-	enc.Encode(v)
-	return buf.String()
 }
