@@ -119,6 +119,9 @@ func TestReadSinglePage(t *testing.T) {
 		testutils.CreateTestOktaUser("user1", "active", "stephen", "fry", "stephen@planetexpress.com", "123456"),
 	}, &okta.Response{NextPage: ""}, nil)
 
+	p.client.(*oktaclient.MockOktaClient).EXPECT().ListUserGroups(p.ctx, gomock.Any()).Return([]*okta.Group{}, &okta.Response{NextPage: ""}, nil)
+	p.client.(*oktaclient.MockOktaClient).EXPECT().ListAssignedRolesForUser(p.ctx, gomock.Any(), gomock.Any()).Return([]*okta.Role{}, &okta.Response{NextPage: ""}, nil)
+
 	users, err := p.Read()
 
 	assert.Nil(err)
@@ -143,6 +146,12 @@ func TestReadMultiplePagesAneNextPageFail(t *testing.T) {
 		testutils.CreateTestOktaUser("user1", "active", "stephen", "fry", "stephen@planetexpress.com", "123456"),
 		testutils.CreateTestOktaUser("user2", "active", "stephen2", "fry", "stephen2@planetexpress.com", "123456"),
 	}, &okta.Response{NextPage: "yes"}, nil)
+
+	p.client.(*oktaclient.MockOktaClient).EXPECT().ListUserGroups(p.ctx, "user1").Return([]*okta.Group{}, &okta.Response{NextPage: ""}, nil)
+	p.client.(*oktaclient.MockOktaClient).EXPECT().ListUserGroups(p.ctx, "user2").Return([]*okta.Group{}, &okta.Response{NextPage: ""}, nil)
+
+	p.client.(*oktaclient.MockOktaClient).EXPECT().ListAssignedRolesForUser(p.ctx, "user1", gomock.Any()).Return([]*okta.Role{}, &okta.Response{NextPage: ""}, nil)
+	p.client.(*oktaclient.MockOktaClient).EXPECT().ListAssignedRolesForUser(p.ctx, "user2", gomock.Any()).Return([]*okta.Role{}, &okta.Response{NextPage: ""}, nil)
 
 	// Act
 	users1, err1 := p.Read()
@@ -174,6 +183,12 @@ func TestReadMultiplePages(t *testing.T) {
 		testutils.CreateTestOktaUser("user1", "active", "stephen", "fry", "stephen@planetexpress.com", "123456"),
 		testutils.CreateTestOktaUser("user2", "active", "stephen2", "fry", "stephen2@planetexpress.com", "123456"),
 	}, &okta.Response{NextPage: "yes"}, nil)
+
+	p.client.(*oktaclient.MockOktaClient).EXPECT().ListUserGroups(p.ctx, "user1").Return([]*okta.Group{}, &okta.Response{NextPage: ""}, nil)
+	p.client.(*oktaclient.MockOktaClient).EXPECT().ListUserGroups(p.ctx, "user2").Return([]*okta.Group{}, &okta.Response{NextPage: ""}, nil)
+
+	p.client.(*oktaclient.MockOktaClient).EXPECT().ListAssignedRolesForUser(p.ctx, "user1", gomock.Any()).Return([]*okta.Role{}, &okta.Response{NextPage: ""}, nil)
+	p.client.(*oktaclient.MockOktaClient).EXPECT().ListAssignedRolesForUser(p.ctx, "user2", gomock.Any()).Return([]*okta.Role{}, &okta.Response{NextPage: ""}, nil)
 
 	// Act
 	users1, err := p.Read()
