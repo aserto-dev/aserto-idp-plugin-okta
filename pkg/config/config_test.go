@@ -60,7 +60,7 @@ func TestValidateWithUserPIDAndEmail(t *testing.T) {
 	assert.Contains(err.Error(), "rpc error: code = InvalidArgument desc = an user PID and an user email were provided; please specify only one")
 }
 
-func TestDecription(t *testing.T) {
+func TestDescription(t *testing.T) {
 	assert := require.New(t)
 	config := OktaConfig{
 		Domain:   "test",

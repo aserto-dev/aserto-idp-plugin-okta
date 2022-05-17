@@ -24,7 +24,6 @@ require (
 
 require (
 	github.com/aserto-dev/clui v0.8.1 // indirect
-	github.com/aserto-dev/go-utils v0.8.9
 	github.com/docker/distribution v2.8.0+incompatible // indirect
 )
 

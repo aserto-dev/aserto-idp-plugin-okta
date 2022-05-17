@@ -1,6 +1,7 @@
 .dev/
 .ext/
 .vscode/
+!.vscode/launch.json
 
 cover.out
 
