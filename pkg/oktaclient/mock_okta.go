@@ -98,6 +98,38 @@ func (mr *MockOktaClientMockRecorder) GetUser(ctx, userID interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockOktaClient)(nil).GetUser), ctx, userID)
 }
 
+// ListAssignedRolesForUser mocks base method.
+func (m *MockOktaClient) ListAssignedRolesForUser(ctx context.Context, userID string, qp *query.Params) ([]*okta.Role, *okta.Response, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListAssignedRolesForUser", ctx, userID, qp)
+	ret0, _ := ret[0].([]*okta.Role)
+	ret1, _ := ret[1].(*okta.Response)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// ListAssignedRolesForUser indicates an expected call of ListAssignedRolesForUser.
+func (mr *MockOktaClientMockRecorder) ListAssignedRolesForUser(ctx, userID, qp interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAssignedRolesForUser", reflect.TypeOf((*MockOktaClient)(nil).ListAssignedRolesForUser), ctx, userID, qp)
+}
+
+// ListUserGroups mocks base method.
+func (m *MockOktaClient) ListUserGroups(ctx context.Context, userID string) ([]*okta.Group, *okta.Response, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListUserGroups", ctx, userID)
+	ret0, _ := ret[0].([]*okta.Group)
+	ret1, _ := ret[1].(*okta.Response)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// ListUserGroups indicates an expected call of ListUserGroups.
+func (mr *MockOktaClientMockRecorder) ListUserGroups(ctx, userID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListUserGroups", reflect.TypeOf((*MockOktaClient)(nil).ListUserGroups), ctx, userID)
+}
+
 // ListUsers mocks base method.
 func (m *MockOktaClient) ListUsers(ctx context.Context, qp *query.Params) ([]*okta.User, *okta.Response, error) {
 	m.ctrl.T.Helper()
