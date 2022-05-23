@@ -73,50 +73,32 @@ func (o *OktaPlugin) Read() ([]*api.User, error) {
 	}
 
 	if o.response == nil {
-		oktaUsers, resp, err := o.client.ListUsers(o.ctx, nil)
+		oktaUsers, respUsers, err := o.client.ListUsers(o.ctx, nil)
 
 		if err != nil {
 			return nil, err
 		}
 
-		if resp.StatusCode == http.StatusTooManyRequests {
-			log.Trace().Int("status", resp.StatusCode).Msg("users")
+		if respUsers.StatusCode == http.StatusTooManyRequests {
+			log.Trace().Int("status", respUsers.StatusCode).Msg("users")
 		}
 
 		for _, u := range oktaUsers {
 			user := transform.FromOkta(u)
 
-			if groups, resp, err := o.client.ListUserGroups(o.ctx, u.Id); err == nil && groups != nil && len(groups) != 0 {
-				if resp.StatusCode == http.StatusTooManyRequests {
-					log.Trace().Int("status", resp.StatusCode).Msg("groups")
-				}
-
-				g := make([]interface{}, 0)
-				for _, group := range groups {
-					g = append(g, group.Profile.Name)
-				}
-
-				l, err := structpb.NewList(g)
-				if err == nil {
-					user.Attributes.Properties.Fields["groups"] = structpb.NewListValue(l)
-				}
+			if err := getGroups(o, u, user); err != nil {
+				log.Error().Err(err).Str("userID", u.Id).Msg("getGroups")
 			}
 
-			if roles, resp, err := o.client.ListAssignedRolesForUser(o.ctx, u.Id, nil); err == nil && roles != nil && len(roles) != 0 {
-				if resp.StatusCode == http.StatusTooManyRequests {
-					log.Trace().Int("status", resp.StatusCode).Msg("roles")
-				}
-
-				for _, role := range roles {
-					user.Attributes.Roles = append(user.Attributes.Roles, role.Type)
-				}
+			if err := getRoles(o, u, user); err != nil {
+				log.Error().Err(err).Str("userID", u.Id).Msg("getRoles")
 			}
 
 			users = append(users, user)
 		}
 
-		if resp.HasNextPage() {
-			o.response = resp
+		if respUsers.HasNextPage() {
+			o.response = respUsers
 			o.users = oktaUsers
 		} else {
 			o.finishedRead = true
@@ -144,6 +126,48 @@ func (o *OktaPlugin) Read() ([]*api.User, error) {
 	}
 
 	return users, errs
+}
+
+func getGroups(o *OktaPlugin, u *okta.User, user *api.User) error {
+	if groups, resp, err := o.client.ListUserGroups(o.ctx, u.Id); err == nil && groups != nil && len(groups) != 0 {
+		if err != nil {
+			return err
+		}
+
+		if resp.StatusCode == http.StatusTooManyRequests {
+			log.Trace().Int("status", resp.StatusCode).Msg("groups")
+		}
+
+		g := make([]interface{}, 0)
+		for _, group := range groups {
+			g = append(g, group.Profile.Name)
+		}
+
+		l, err := structpb.NewList(g)
+		if err == nil {
+			user.Attributes.Properties.Fields["groups"] = structpb.NewListValue(l)
+		}
+	}
+
+	return nil
+}
+
+func getRoles(o *OktaPlugin, u *okta.User, user *api.User) error {
+	if roles, respRoles, err := o.client.ListAssignedRolesForUser(o.ctx, u.Id, nil); err == nil && roles != nil && len(roles) != 0 {
+		if err != nil {
+			return err
+		}
+
+		if respRoles.StatusCode == http.StatusTooManyRequests {
+			log.Trace().Int("status", respRoles.StatusCode).Msg("roles")
+		}
+
+		for _, role := range roles {
+			user.Attributes.Roles = append(user.Attributes.Roles, role.Type)
+		}
+	}
+
+	return nil
 }
 
 func (o *OktaPlugin) readByInfo(info string) ([]*api.User, error) {
