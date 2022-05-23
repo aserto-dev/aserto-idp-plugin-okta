@@ -73,32 +73,31 @@ func (o *OktaPlugin) Read() ([]*api.User, error) {
 	}
 
 	if o.response == nil {
-		oktaUsers, respUsers, err := o.client.ListUsers(o.ctx, nil)
-
+		oktaUsers, resp, err := o.client.ListUsers(o.ctx, nil)
 		if err != nil {
 			return nil, err
 		}
 
-		if respUsers.StatusCode == http.StatusTooManyRequests {
-			log.Trace().Int("status", respUsers.StatusCode).Msg("users")
+		if resp.Response != nil && resp.StatusCode == http.StatusTooManyRequests {
+			log.Trace().Int("status", resp.StatusCode).Msg("users")
 		}
 
 		for _, u := range oktaUsers {
 			user := transform.FromOkta(u)
 
-			if err := getGroups(o, u, user); err != nil {
+			if err := o.getGroups(u, user); err != nil {
 				log.Error().Err(err).Str("userID", u.Id).Msg("getGroups")
 			}
 
-			if err := getRoles(o, u, user); err != nil {
+			if err := o.getRoles(u, user); err != nil {
 				log.Error().Err(err).Str("userID", u.Id).Msg("getRoles")
 			}
 
 			users = append(users, user)
 		}
 
-		if respUsers.HasNextPage() {
-			o.response = respUsers
+		if resp.HasNextPage() {
+			o.response = resp
 			o.users = oktaUsers
 		} else {
 			o.finishedRead = true
@@ -128,13 +127,13 @@ func (o *OktaPlugin) Read() ([]*api.User, error) {
 	return users, errs
 }
 
-func getGroups(o *OktaPlugin, u *okta.User, user *api.User) error {
+func (o *OktaPlugin) getGroups(u *okta.User, user *api.User) error {
 	if groups, resp, err := o.client.ListUserGroups(o.ctx, u.Id); err == nil && groups != nil && len(groups) != 0 {
 		if err != nil {
 			return err
 		}
 
-		if resp.StatusCode == http.StatusTooManyRequests {
+		if resp.Response != nil && resp.StatusCode == http.StatusTooManyRequests {
 			log.Trace().Int("status", resp.StatusCode).Msg("groups")
 		}
 
@@ -152,14 +151,14 @@ func getGroups(o *OktaPlugin, u *okta.User, user *api.User) error {
 	return nil
 }
 
-func getRoles(o *OktaPlugin, u *okta.User, user *api.User) error {
-	if roles, respRoles, err := o.client.ListAssignedRolesForUser(o.ctx, u.Id, nil); err == nil && roles != nil && len(roles) != 0 {
+func (o *OktaPlugin) getRoles(u *okta.User, user *api.User) error {
+	if roles, resp, err := o.client.ListAssignedRolesForUser(o.ctx, u.Id, nil); err == nil && roles != nil && len(roles) != 0 {
 		if err != nil {
 			return err
 		}
 
-		if respRoles.StatusCode == http.StatusTooManyRequests {
-			log.Trace().Int("status", respRoles.StatusCode).Msg("roles")
+		if resp.Response != nil && resp.StatusCode == http.StatusTooManyRequests {
+			log.Trace().Int("status", resp.StatusCode).Msg("roles")
 		}
 
 		for _, role := range roles {
