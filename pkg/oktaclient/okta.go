@@ -29,6 +29,10 @@ func NewOktaClient(ctx context.Context, cfg *config.OktaConfig) (OktaClient, err
 		ctx,
 		okta.WithOrgUrl(fmt.Sprintf("https://%s", cfg.Domain)),
 		okta.WithToken(cfg.APIToken),
+		okta.WithConnectionTimeout(5),
+		okta.WithRequestTimeout(5),
+		okta.WithRateLimitMaxBackOff(30),
+		okta.WithRateLimitMaxRetries(3),
 	)
 
 	if err != nil {
