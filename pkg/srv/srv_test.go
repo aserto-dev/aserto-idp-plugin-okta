@@ -1,3 +1,4 @@
+// nolint: testpackage // current tests rely on internals access
 package srv
 
 import (
