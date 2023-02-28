@@ -70,8 +70,13 @@ func TestReadUserByID(t *testing.T) {
 	users, err := p.Read()
 
 	assert.Nil(err)
-	assert.NotNil(users)
-	assert.Equal(users[0].Id, oktaUser.Id)
+	assert.Len(users, 1)
+
+	user := users[0]
+	assert.Empty(user.Id)
+
+	profile := *oktaUser.Profile
+	assert.Equal(user.Email, profile["login"].(string))
 }
 
 func TestReadUserByEmail(t *testing.T) {
@@ -87,8 +92,13 @@ func TestReadUserByEmail(t *testing.T) {
 	users, err := p.Read()
 
 	assert.Nil(err)
-	assert.NotNil(users)
-	assert.Equal(users[0].Id, oktaUser.Id)
+	assert.Len(users, 1)
+
+	user := users[0]
+	assert.Empty(user.Id)
+
+	profile := *oktaUser.Profile
+	assert.Equal(user.Email, profile["login"].(string))
 }
 
 func TestReadFailToRetriveUsers(t *testing.T) {
@@ -199,7 +209,7 @@ func TestReadMultiplePages(t *testing.T) {
 	assert.Nil(err)
 	assert.Len(users1, 2)
 	assert.Len(users2, 1)
-	assert.NotEqual(users1[0].Id, users2[0].Id)
+	assert.NotEqual(users1[0].DisplayName, users2[0].DisplayName)
 }
 
 func TestDeleteWithInvalidId(t *testing.T) {
