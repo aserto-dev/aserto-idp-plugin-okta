@@ -83,7 +83,6 @@ func FromOkta(in *okta.User) *api.User {
 	}
 
 	user := api.User{
-		Id:          in.Id,
 		DisplayName: displayName,
 		Email:       email,
 		Picture:     "",

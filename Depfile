@@ -2,13 +2,14 @@
 bin:
   vault:
     url: "https://releases.hashicorp.com/vault/{{.Version}}/vault_{{.Version}}_{{.OS}}_{{.Arch}}.zip"
-    version: "1.8.1"
+    version: "1.8.12"
     zipPaths:
     - "./vault"
     sha:
-      linux-amd64: "bb411f2bbad79c2e4f0640f1d3d5ef50e2bda7d4f40875a56917c95ff783c2db"
-      darwin-amd64: "f87221e4f56b3da41f0a029bf2b48896ec3be84dd7075bdb9466def1e056f809"
-      darwin-arm64: "571985c34990a2a7b913cee8c50be42b34c8d8cb751a2aed2c80121ad4b4e44b"
+      linux-amd64: "88c280945db62b118435ec1bf0086a719f6b6551cba052e5f8d1e25a80884bca"
+      linux-arm64: "e57e719e1eec9bce9057751e2583907210d3ac99c0a01897479506fbb2af828d"
+      darwin-amd64: "db30ea93bc9a87c37d0215515f4d28d3513f84b793c6f9958ac5dea6edd53242"
+      darwin-arm64: "18096cfdacba56a806f1b4b47ea20b3c03f062b5162c53a2b61b0b591d00aa65"
   oras:
     url: "https://github.com/oras-project/oras/releases/download/v{{.Version}}/oras_{{.Version}}_{{.OS}}_{{.Arch}}.tar.gz"
     version: "0.12.0"
@@ -19,7 +20,7 @@ bin:
       darwin-amd64:  "3637530cd3d01e2b3dc43fc4692edd36c71919726be9fdbb3b298ce0979bbabb"
       darwin-arm64:  "0cfb07da7c8d6ceef7a3850140c8d25bf64139b0cb3bf221fa4e7aeb0e0a1a73"
     tgzPaths:
-    - "./oras" 
+    - "./oras"
 
 go:
   sver:

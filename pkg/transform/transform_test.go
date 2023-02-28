@@ -50,7 +50,7 @@ func TestFromOktaWithActiveCompleteUser(t *testing.T) {
 
 	apiUser := FromOkta(oktaUser)
 
-	assert.Equal("1", apiUser.Id, "should correctly detect the id")
+	assert.Empty(apiUser.Id, "should leave the id empty")
 	assert.Equal("First Last", apiUser.DisplayName, "should correctly construct the displayName")
 	assert.Equal("active", apiUser.Attributes.Properties.Fields["status"].GetStringValue(), "should add status to attributes")
 	assert.Equal("test", apiUser.Attributes.Properties.Fields["additional_info"].GetStringValue(), "should add additional profile info to attributes")
@@ -75,7 +75,7 @@ func TestFromOktaWithDeprovisionedUser(t *testing.T) {
 
 	apiUser := FromOkta(oktaUser)
 
-	assert.Equal("1", apiUser.Id, "should correctly detect the id")
+	assert.Empty(apiUser.Id, "should leave the id empty")
 	assert.Equal("deprovisioned", apiUser.Attributes.Properties.Fields["status"].GetStringValue(), "should add status to attributes")
 	assert.True(apiUser.Identities["1"].Verified, "should always add user id as verified")
 	assert.False(apiUser.Identities["testemail@test.com"].Verified, "should add user email as unverified")
