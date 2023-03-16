@@ -1,10 +1,11 @@
-package transform
+package transform_test
 
 import (
 	"reflect"
 	"testing"
 
 	"github.com/aserto-dev/aserto-idp-plugin-okta/pkg/testutils"
+	"github.com/aserto-dev/aserto-idp-plugin-okta/pkg/transform"
 	"github.com/okta/okta-sdk-golang/v2/okta"
 	"github.com/stretchr/testify/require"
 )
@@ -13,7 +14,7 @@ func TestConstructOktaProfile(t *testing.T) {
 	assert := require.New(t)
 	apiUser := testutils.CreateTestAPIUser("1", "First Last", "testemail@test.com", "active", "40772233223")
 
-	oktaProfile := ConstructOktaProfile(apiUser)
+	oktaProfile := transform.ConstructOktaProfile(apiUser)
 
 	assert.True(reflect.TypeOf(*oktaProfile) == reflect.TypeOf(okta.UserProfile{}), "the returned object should be *okta.Profile")
 	assert.Equal("First", (*oktaProfile)["firstName"], "should correctly detect the first name")
@@ -27,7 +28,7 @@ func TestConstructOktaProfileWithUserHavingOnlyFirstName(t *testing.T) {
 	assert := require.New(t)
 	apiUserWOLastName := testutils.CreateTestAPIUser("1", "First", "testemail@test.com", "active", "40772233223")
 
-	oktaProfileWOLastName := ConstructOktaProfile(apiUserWOLastName)
+	oktaProfileWOLastName := transform.ConstructOktaProfile(apiUserWOLastName)
 
 	assert.Equal("First", (*oktaProfileWOLastName)["firstName"], "should detect the first name and not be empty")
 	assert.Equal(" ", (*oktaProfileWOLastName)["lastName"], "should detect the last name and be a white space")
@@ -37,7 +38,7 @@ func TestToOktaUserReq(t *testing.T) {
 	assert := require.New(t)
 	apiUser := testutils.CreateTestAPIUser("1", "First Last", "testemail@test.com", "active", "40772233223")
 
-	oktaUserReq := ToOktaUserReq(apiUser)
+	oktaUserReq := transform.ToOktaUserReq(apiUser)
 
 	assert.True(reflect.TypeOf(*oktaUserReq) == reflect.TypeOf(okta.CreateUserRequest{}), "the returned object should be *okta.CreateUserRequest")
 	assert.Equal("testemail@test.com", (*oktaUserReq.Profile)["email"], "should correctly populate the user profile")
@@ -48,7 +49,7 @@ func TestFromOktaWithActiveCompleteUser(t *testing.T) {
 	oktaUser := testutils.CreateTestOktaUser("1", "ACTIVE", "First", "Last", "testemail@test.com", "+40772233223")
 	(*oktaUser.Profile)["additional_info"] = "test"
 
-	apiUser := FromOkta(oktaUser)
+	apiUser := transform.FromOkta(oktaUser)
 
 	assert.Empty(apiUser.Id, "should leave the id empty")
 	assert.Equal("First Last", apiUser.DisplayName, "should correctly construct the displayName")
@@ -63,7 +64,7 @@ func TestFromOktaWithIncorrectPhoneNumberUser(t *testing.T) {
 	assert := require.New(t)
 	oktaUser := testutils.CreateTestOktaUser("1", "ACTIVE", "First", "Last", "testemail@test.com", "0772233223")
 
-	apiUser := FromOkta(oktaUser)
+	apiUser := transform.FromOkta(oktaUser)
 
 	assert.Equal(2, len(apiUser.Identities), "2 identities should be populated")
 	assert.Nil(apiUser.Identities["0772233223"], "should not add the phone number to identities")
@@ -73,7 +74,7 @@ func TestFromOktaWithDeprovisionedUser(t *testing.T) {
 	assert := require.New(t)
 	oktaUser := testutils.CreateTestOktaUser("1", "DEPROVISIONED", "First", "Last", "testemail@test.com", "+40772233223")
 
-	apiUser := FromOkta(oktaUser)
+	apiUser := transform.FromOkta(oktaUser)
 
 	assert.Empty(apiUser.Id, "should leave the id empty")
 	assert.Equal("deprovisioned", apiUser.Attributes.Properties.Fields["status"].GetStringValue(), "should add status to attributes")
@@ -89,7 +90,7 @@ func TestFromOktaWithUserCustomAttributes(t *testing.T) {
 	roles = append(roles, "admin", "plan")
 	oktaUser := testutils.CreateTestOktaUserWithCustomAttribute("roles", roles)
 
-	apiUser := FromOkta(oktaUser)
+	apiUser := transform.FromOkta(oktaUser)
 
 	rolesTranslated := apiUser.Attributes.Properties.Fields["roles"].GetListValue().Values
 	assert.Equal(roles[0], rolesTranslated[0].GetStringValue(), "should add custom attributes with proper type")
@@ -101,7 +102,7 @@ func TestFromOktaWithInvalidTypeUserCustomAttributes(t *testing.T) {
 	roles := [2]string{"admin", "plan"}
 	oktaUser := testutils.CreateTestOktaUserWithCustomAttribute("roles", roles)
 
-	apiUser := FromOkta(oktaUser)
+	apiUser := transform.FromOkta(oktaUser)
 
 	rolesTranslated := apiUser.Attributes.Properties.Fields["roles"]
 	assert.Nil(rolesTranslated)

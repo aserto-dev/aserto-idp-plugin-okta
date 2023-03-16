@@ -18,7 +18,7 @@ import (
 
 func init() {
 	// Set go version for docker builds
-	os.Setenv("GO_VERSION", "1.17")
+	os.Setenv("GO_VERSION", "1.19")
 	// Set private repositories
 	os.Setenv("GOPRIVATE", "github.com/aserto-dev")
 }
@@ -29,9 +29,9 @@ var (
 	pluginName = "aserto-idp-plugin-okta"
 	ghName     = "ghcr.io/aserto-dev/aserto-idp-plugins_"
 	osMap      = map[string][]string{
-		"linux":   {"arm64", "amd64"},
-		"darwin":  {"arm64", "amd64"},
-		"windows": {"amd64"},
+		"linux":   {"arm64", "amd64_v1"},
+		"darwin":  {"arm64", "amd64_v1"},
+		"windows": {"amd64_v1"},
 	}
 
 	extensions = map[string]string{
@@ -118,7 +118,7 @@ func Publish() error {
 		for _, arch := range archs {
 			buildPath := filepath.Join(pwd, "dist", pluginName+"_"+operatingSystem+"_"+arch)
 			os.Chdir(buildPath)
-			grName := fmt.Sprintf("%s%s_%s:%s-%s", ghName, operatingSystem, arch, "okta", version)
+			grName := fmt.Sprintf("%s%s_%s:%s-%s", ghName, operatingSystem, iff(arch == "amd64_v1", "amd64", arch), "okta", version)
 			location := fmt.Sprintf("%s%s:%s", pluginName, extensions[operatingSystem], mediaType)
 
 			err = oras("push", "-u", username, "-p", password, grName, location)
@@ -129,4 +129,11 @@ func Publish() error {
 	}
 
 	return nil
+}
+
+func iff[T any](cond bool, valTrue, valFalse T) T {
+	if cond {
+		return valTrue
+	}
+	return valFalse
 }
