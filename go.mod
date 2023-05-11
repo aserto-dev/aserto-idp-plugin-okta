@@ -24,7 +24,7 @@ require (
 
 require (
 	github.com/aserto-dev/clui v0.8.1 // indirect
-	github.com/docker/distribution v2.8.0+incompatible // indirect
+	github.com/docker/distribution v2.8.2+incompatible // indirect
 )
 
 require (
